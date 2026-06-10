@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fawtara
+      POSTGRES_PASSWORD: fawtara
+      POSTGRES_DB: fawtara
+    ports:
+      - "5433:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fawtara -d fawtara"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      FAWTARA_DATABASE_URL: postgresql+psycopg://fawtara_app:fawtara_app@db:5432/fawtara
+      FAWTARA_ADMIN_DATABASE_URL: postgresql+psycopg://fawtara:fawtara@db:5432/fawtara
+      FAWTARA_REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: ./backend
+    command: celery -A app.worker.celery_app worker --loglevel=info
+    environment:
+      FAWTARA_DATABASE_URL: postgresql+psycopg://fawtara_app:fawtara_app@db:5432/fawtara
+      FAWTARA_ADMIN_DATABASE_URL: postgresql+psycopg://fawtara:fawtara@db:5432/fawtara
+      FAWTARA_REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # frontend service lands in M6 (React + Vite + TS)
+
+volumes:
+  dbdata:

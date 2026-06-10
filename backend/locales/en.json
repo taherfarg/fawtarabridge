@@ -1,0 +1,97 @@
+{
+  "errors": {
+    "auth": {
+      "invalid_credentials": {
+        "message": "Incorrect email or password",
+        "suggestion": "Check your details and try again"
+      },
+      "email_exists": {
+        "message": "This email is already registered",
+        "suggestion": "Log in instead of creating a new account"
+      },
+      "not_authenticated": {
+        "message": "You must be logged in to access this service"
+      },
+      "token_invalid": {
+        "message": "Invalid access token",
+        "suggestion": "Log in again"
+      },
+      "token_expired": {
+        "message": "Your session token has expired",
+        "suggestion": "Refresh the session or log in again"
+      },
+      "forbidden": {
+        "message": "You do not have permission to perform this action",
+        "suggestion": "Ask the account owner to grant you access"
+      },
+      "no_tenant": {
+        "message": "Your account is not linked to any company",
+        "suggestion": "Ask the company owner to add you"
+      },
+      "not_member": {
+        "message": "You are not a member of this company"
+      },
+      "user_inactive": {
+        "message": "This account is deactivated",
+        "suggestion": "Contact support"
+      }
+    },
+    "tenant": {
+      "trn_exists": {
+        "message": "This TRN is already registered to another company",
+        "suggestion": "Check the number, or contact support if this is your TRN"
+      },
+      "not_found": {
+        "message": "Company not found"
+      }
+    },
+    "member": {
+      "already_exists": {
+        "message": "This user is already a member of the company"
+      }
+    },
+    "otp": {
+      "not_found": {
+        "message": "No active verification code",
+        "suggestion": "Request a new code"
+      },
+      "expired": {
+        "message": "The verification code has expired",
+        "suggestion": "Request a new code"
+      },
+      "invalid": {
+        "message": "Incorrect verification code",
+        "suggestion": "Check the code sent to your phone"
+      },
+      "too_many_attempts": {
+        "message": "Too many incorrect attempts",
+        "suggestion": "Request a new code"
+      }
+    },
+    "validation": {
+      "missing": {
+        "message": "This field is required"
+      },
+      "invalid": {
+        "message": "Invalid value for this field"
+      },
+      "trn_invalid": {
+        "message": "The TRN must be exactly 15 digits",
+        "suggestion": "Enter the number exactly as it appears on your tax registration certificate"
+      },
+      "phone_invalid": {
+        "message": "Invalid phone number",
+        "suggestion": "Enter an international number, e.g. +9715XXXXXXXX"
+      },
+      "password_weak": {
+        "message": "Password must be at least {min_length} characters"
+      }
+    }
+  },
+  "roles": {
+    "owner": "Owner",
+    "accountant": "Accountant",
+    "staff": "Staff",
+    "readonly": "Read-only"
+  }
+}

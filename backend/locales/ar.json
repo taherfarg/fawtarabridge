@@ -1,0 +1,97 @@
+{
+  "errors": {
+    "auth": {
+      "invalid_credentials": {
+        "message": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "suggestion": "تحقق من بياناتك وحاول مرة أخرى"
+      },
+      "email_exists": {
+        "message": "هذا البريد الإلكتروني مسجل بالفعل",
+        "suggestion": "سجّل الدخول بدلاً من إنشاء حساب جديد"
+      },
+      "not_authenticated": {
+        "message": "يجب تسجيل الدخول للوصول إلى هذه الخدمة"
+      },
+      "token_invalid": {
+        "message": "رمز الدخول غير صالح",
+        "suggestion": "سجّل الدخول مرة أخرى"
+      },
+      "token_expired": {
+        "message": "انتهت صلاحية رمز الجلسة",
+        "suggestion": "حدّث الجلسة أو سجّل الدخول مرة أخرى"
+      },
+      "forbidden": {
+        "message": "لا تملك الصلاحية لتنفيذ هذا الإجراء",
+        "suggestion": "اطلب من مالك الحساب منحك الصلاحية"
+      },
+      "no_tenant": {
+        "message": "حسابك غير مرتبط بأي شركة",
+        "suggestion": "اطلب من مالك الشركة إضافتك"
+      },
+      "not_member": {
+        "message": "لست عضواً في هذه الشركة"
+      },
+      "user_inactive": {
+        "message": "هذا الحساب معطّل",
+        "suggestion": "تواصل مع الدعم الفني"
+      }
+    },
+    "tenant": {
+      "trn_exists": {
+        "message": "رقم التسجيل الضريبي مسجل بالفعل لشركة أخرى",
+        "suggestion": "تحقق من الرقم، أو تواصل مع الدعم إذا كان هذا رقمك"
+      },
+      "not_found": {
+        "message": "الشركة غير موجودة"
+      }
+    },
+    "member": {
+      "already_exists": {
+        "message": "هذا المستخدم عضو في الشركة بالفعل"
+      }
+    },
+    "otp": {
+      "not_found": {
+        "message": "لا يوجد رمز تحقق نشط",
+        "suggestion": "اطلب رمزاً جديداً"
+      },
+      "expired": {
+        "message": "انتهت صلاحية رمز التحقق",
+        "suggestion": "اطلب رمزاً جديداً"
+      },
+      "invalid": {
+        "message": "رمز التحقق غير صحيح",
+        "suggestion": "تحقق من الرمز المرسل إلى هاتفك"
+      },
+      "too_many_attempts": {
+        "message": "تجاوزت عدد المحاولات المسموح بها",
+        "suggestion": "اطلب رمزاً جديداً"
+      }
+    },
+    "validation": {
+      "missing": {
+        "message": "هذا الحقل مطلوب"
+      },
+      "invalid": {
+        "message": "قيمة غير صالحة لهذا الحقل"
+      },
+      "trn_invalid": {
+        "message": "رقم التسجيل الضريبي يجب أن يتكون من 15 رقماً بالضبط",
+        "suggestion": "أدخل الرقم كما يظهر في شهادة التسجيل الضريبي"
+      },
+      "phone_invalid": {
+        "message": "رقم الهاتف غير صالح",
+        "suggestion": "أدخل رقماً دولياً مثل ‎+9715XXXXXXXX"
+      },
+      "password_weak": {
+        "message": "كلمة المرور يجب ألا تقل عن {min_length} أحرف"
+      }
+    }
+  },
+  "roles": {
+    "owner": "المالك",
+    "accountant": "محاسب",
+    "staff": "موظف",
+    "readonly": "قراءة فقط"
+  }
+}
