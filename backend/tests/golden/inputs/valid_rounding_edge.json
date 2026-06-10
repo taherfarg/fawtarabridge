@@ -1,0 +1,35 @@
+{
+  "invoice_number": "INV-2026-0500",
+  "issue_date": "2026-05-30",
+  "currency": "AED",
+  "note": "Rounding edge case: VAT is computed per category, not per line",
+  "supplier": {
+    "name": "Micro Parts Trading LLC",
+    "trn": "100777888900001"
+  },
+  "buyer": {
+    "name": "Precision Repairs LLC",
+    "trn": "100123987600002"
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Rubber washer 6mm",
+      "quantity": "1",
+      "unit_price": "0.105",
+      "vat_category": "S",
+      "vat_rate": "5"
+    },
+    {
+      "line_id": "2",
+      "description": "Rubber washer 8mm",
+      "quantity": "1",
+      "unit_price": "0.105",
+      "vat_category": "S",
+      "vat_rate": "5"
+    }
+  ],
+  "declared_total_excluding_vat": "0.22",
+  "declared_total_vat": "0.01",
+  "declared_total_including_vat": "0.23"
+}

@@ -1,0 +1,26 @@
+{
+  "invoice_number": "INV-2026-0006",
+  "issue_date": "2026-05-15",
+  "currency": "AED",
+  "supplier": {
+    "name": "Al Noor Trading LLC",
+    "trn": "100123456700001"
+  },
+  "buyer": {
+    "name": "Gulf Builders LLC",
+    "trn": "100765432100002"
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Steel pipes 2-inch",
+      "quantity": "10",
+      "unit_price": "100.00",
+      "vat_category": "S",
+      "vat_rate": "5"
+    }
+  ],
+  "declared_total_excluding_vat": "999.00",
+  "declared_total_vat": "55.00",
+  "declared_total_including_vat": "1100.00"
+}

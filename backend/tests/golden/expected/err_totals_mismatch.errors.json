@@ -1,0 +1,26 @@
+[
+  {
+    "code": "invoice.calc.total_excl_mismatch",
+    "field": "declared_total_excluding_vat",
+    "message_en": "Total excluding VAT 999.00 does not match the sum of line amounts 1000.00",
+    "message_ar": "الإجمالي قبل الضريبة 999.00 لا يطابق مجموع مبالغ البنود 1000.00",
+    "suggestion_en": "Correct the total or the invoice lines",
+    "suggestion_ar": "صحّح الإجمالي أو بنود الفاتورة"
+  },
+  {
+    "code": "invoice.calc.total_vat_mismatch",
+    "field": "declared_total_vat",
+    "message_en": "VAT total 55.00 does not match the computed VAT 50.00",
+    "message_ar": "إجمالي الضريبة 55.00 لا يطابق الضريبة المحسوبة 50.00",
+    "suggestion_en": "Correct the VAT total or the invoice lines",
+    "suggestion_ar": "صحّح إجمالي الضريبة أو بنود الفاتورة"
+  },
+  {
+    "code": "invoice.calc.total_incl_mismatch",
+    "field": "declared_total_including_vat",
+    "message_en": "Total including VAT 1100.00 does not match the computed total 1050.00",
+    "message_ar": "الإجمالي شامل الضريبة 1100.00 لا يطابق الإجمالي المحسوب 1050.00",
+    "suggestion_en": "Correct the total or the invoice lines",
+    "suggestion_ar": "صحّح الإجمالي أو بنود الفاتورة"
+  }
+]

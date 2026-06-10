@@ -1,0 +1,10 @@
+[
+  {
+    "code": "invoice.buyer_trn_missing",
+    "field": "buyer.trn",
+    "message_en": "Buyer TRN is required",
+    "message_ar": "رقم التسجيل الضريبي للمشتري مطلوب",
+    "suggestion_en": "Ask your customer for their 15-digit tax registration number",
+    "suggestion_ar": "اطلب من عميلك رقم التسجيل الضريبي المكوّن من 15 رقماً"
+  }
+]

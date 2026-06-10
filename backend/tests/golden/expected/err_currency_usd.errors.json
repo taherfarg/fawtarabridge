@@ -1,0 +1,10 @@
+[
+  {
+    "code": "invoice.currency_unsupported",
+    "field": "currency",
+    "message_en": "Currency 'USD' is not supported — invoices must be issued in AED",
+    "message_ar": "العملة 'USD' غير مدعومة — يجب إصدار الفواتير بالدرهم الإماراتي",
+    "suggestion_en": "Convert the amounts to AED before submitting",
+    "suggestion_ar": "حوّل المبالغ إلى الدرهم الإماراتي قبل الإرسال"
+  }
+]

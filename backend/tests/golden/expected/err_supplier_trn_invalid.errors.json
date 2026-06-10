@@ -1,0 +1,10 @@
+[
+  {
+    "code": "invoice.supplier_trn_invalid",
+    "field": "supplier.trn",
+    "message_en": "Supplier TRN '12345678901' must be exactly 15 digits",
+    "message_ar": "رقم التسجيل الضريبي للمورّد '12345678901' يجب أن يتكون من 15 رقماً بالضبط",
+    "suggestion_en": "Enter the number exactly as it appears on the tax registration certificate",
+    "suggestion_ar": "أدخل الرقم كما يظهر في شهادة التسجيل الضريبي"
+  }
+]

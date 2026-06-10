@@ -86,6 +86,100 @@
       "password_weak": {
         "message": "كلمة المرور يجب ألا تقل عن {min_length} أحرف"
       }
+    },
+    "invoice": {
+      "number_missing": {
+        "message": "رقم الفاتورة مطلوب",
+        "suggestion": "أدخل رقم فاتورة فريداً"
+      },
+      "type_code_unsupported": {
+        "message": "نوع الفاتورة '{code}' غير مدعوم — النوع المدعوم هو 380 (فاتورة تجارية) فقط",
+        "suggestion": "سيتم دعم الإشعارات الدائنة وأنواع المستندات الأخرى في إصدار لاحق"
+      },
+      "currency_unsupported": {
+        "message": "العملة '{currency}' غير مدعومة — يجب إصدار الفواتير بالدرهم الإماراتي",
+        "suggestion": "حوّل المبالغ إلى الدرهم الإماراتي قبل الإرسال"
+      },
+      "due_date_before_issue": {
+        "message": "تاريخ الاستحقاق {due_date} يسبق تاريخ الإصدار {issue_date}",
+        "suggestion": "صحّح تاريخ الاستحقاق أو تاريخ الإصدار"
+      },
+      "supplier_name_missing": {
+        "message": "اسم المورّد مطلوب"
+      },
+      "supplier_trn_missing": {
+        "message": "رقم التسجيل الضريبي للمورّد مطلوب",
+        "suggestion": "أدخل رقم التسجيل الضريبي المكوّن من 15 رقماً من إعدادات شركتك"
+      },
+      "supplier_trn_invalid": {
+        "message": "رقم التسجيل الضريبي للمورّد '{value}' يجب أن يتكون من 15 رقماً بالضبط",
+        "suggestion": "أدخل الرقم كما يظهر في شهادة التسجيل الضريبي"
+      },
+      "buyer_name_missing": {
+        "message": "اسم المشتري مطلوب"
+      },
+      "buyer_trn_missing": {
+        "message": "رقم التسجيل الضريبي للمشتري مطلوب",
+        "suggestion": "اطلب من عميلك رقم التسجيل الضريبي المكوّن من 15 رقماً"
+      },
+      "buyer_trn_invalid": {
+        "message": "رقم التسجيل الضريبي للمشتري '{value}' يجب أن يتكون من 15 رقماً بالضبط",
+        "suggestion": "أدخل الرقم كما يظهر في شهادة التسجيل الضريبي للمشتري"
+      },
+      "lines_empty": {
+        "message": "يجب أن تحتوي الفاتورة على بند واحد على الأقل"
+      },
+      "line": {
+        "id_missing": {
+          "message": "رقم البند مطلوب"
+        },
+        "duplicate_id": {
+          "message": "رقم البند '{line_id}' مستخدم أكثر من مرة",
+          "suggestion": "امنح كل بند في الفاتورة رقماً فريداً"
+        },
+        "description_missing": {
+          "message": "وصف البند مطلوب"
+        },
+        "quantity_invalid": {
+          "message": "الكمية يجب أن تكون أكبر من صفر (القيمة المدخلة {actual})"
+        },
+        "price_invalid": {
+          "message": "سعر الوحدة لا يمكن أن يكون سالباً (القيمة المدخلة {actual})"
+        },
+        "discount_invalid": {
+          "message": "الخصم يجب أن يكون بين صفر ومبلغ البند (القيمة المدخلة {actual})"
+        },
+        "vat_rate_mismatch": {
+          "message": "نسبة الضريبة {actual}% لا تطابق الفئة '{category}' (النسبة الصحيحة {expected}%)",
+          "suggestion": "استخدم 5% للبنود الخاضعة للنسبة الأساسية و0% للبنود الخاضعة لنسبة الصفر أو المعفاة أو الخاضعة للاحتساب العكسي"
+        },
+        "exemption_reason_missing": {
+          "message": "سبب الإعفاء مطلوب لبنود الفئة '{category}'",
+          "suggestion": "اذكر سبب إعفاء هذا البند أو خضوعه للاحتساب العكسي"
+        }
+      },
+      "calc": {
+        "line_net_mismatch": {
+          "message": "صافي مبلغ البند {actual} لا يطابق الكمية × السعر − الخصم = {expected}",
+          "suggestion": "صحّح مبلغ البند أو الكمية والسعر والخصم"
+        },
+        "line_vat_mismatch": {
+          "message": "مبلغ ضريبة البند {actual} لا يطابق الضريبة المحسوبة {expected}",
+          "suggestion": "صحّح مبلغ الضريبة أو قيم البند"
+        },
+        "total_excl_mismatch": {
+          "message": "الإجمالي قبل الضريبة {actual} لا يطابق مجموع مبالغ البنود {expected}",
+          "suggestion": "صحّح الإجمالي أو بنود الفاتورة"
+        },
+        "total_vat_mismatch": {
+          "message": "إجمالي الضريبة {actual} لا يطابق الضريبة المحسوبة {expected}",
+          "suggestion": "صحّح إجمالي الضريبة أو بنود الفاتورة"
+        },
+        "total_incl_mismatch": {
+          "message": "الإجمالي شامل الضريبة {actual} لا يطابق الإجمالي المحسوب {expected}",
+          "suggestion": "صحّح الإجمالي أو بنود الفاتورة"
+        }
+      }
     }
   },
   "roles": {

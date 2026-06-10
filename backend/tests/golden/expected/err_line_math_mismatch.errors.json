@@ -1,0 +1,18 @@
+[
+  {
+    "code": "invoice.calc.line_net_mismatch",
+    "field": "lines[0].declared_net_amount",
+    "message_en": "Line net amount 90.00 does not match quantity × price − discount = 100.00",
+    "message_ar": "صافي مبلغ البند 90.00 لا يطابق الكمية × السعر − الخصم = 100.00",
+    "suggestion_en": "Correct the line amount or the quantity, price and discount",
+    "suggestion_ar": "صحّح مبلغ البند أو الكمية والسعر والخصم"
+  },
+  {
+    "code": "invoice.calc.line_vat_mismatch",
+    "field": "lines[0].declared_vat_amount",
+    "message_en": "Line VAT amount 7.00 does not match the computed VAT 5.00",
+    "message_ar": "مبلغ ضريبة البند 7.00 لا يطابق الضريبة المحسوبة 5.00",
+    "suggestion_en": "Correct the VAT amount or the line values",
+    "suggestion_ar": "صحّح مبلغ الضريبة أو قيم البند"
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "invoice_number": "INV-2026-0042",
+  "issue_date": "2026-05-20",
+  "due_date": "2026-06-19",
+  "currency": "AED",
+  "supplier": {
+    "name": "Emirates Office Supplies LLC",
+    "name_ar": "الإمارات للوازم المكتبية ذ.م.م",
+    "trn": "100222333400001",
+    "address": {
+      "street": "Industrial Area 4",
+      "city": "Sharjah",
+      "emirate": "Sharjah"
+    }
+  },
+  "buyer": {
+    "name": "Falcon Insurance Brokers",
+    "name_ar": "فالكون لوساطة التأمين",
+    "trn": "100888999600002",
+    "address": {
+      "city": "Dubai",
+      "emirate": "Dubai"
+    }
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Office desks (oak)",
+      "description_ar": "مكاتب خشب البلوط",
+      "quantity": "3",
+      "unit_price": "150.50",
+      "discount_amount": "51.50",
+      "vat_category": "S",
+      "vat_rate": "5"
+    },
+    {
+      "line_id": "2",
+      "description": "Exported brochures (printed in UAE, shipped abroad)",
+      "quantity": "2",
+      "unit_price": "75",
+      "vat_category": "Z",
+      "vat_rate": "0"
+    },
+    {
+      "line_id": "3",
+      "description": "Life insurance brokerage fee",
+      "quantity": "1",
+      "unit_price": "200",
+      "vat_category": "E",
+      "vat_rate": "0",
+      "exemption_reason": "Exempt financial services — Article 42, VAT Executive Regulation"
+    }
+  ]
+}

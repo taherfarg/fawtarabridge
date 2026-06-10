@@ -1,0 +1,18 @@
+[
+  {
+    "code": "invoice.line.duplicate_id",
+    "field": "lines[1].line_id",
+    "message_en": "Line ID '1' is used more than once",
+    "message_ar": "رقم البند '1' مستخدم أكثر من مرة",
+    "suggestion_en": "Give every invoice line a unique ID",
+    "suggestion_ar": "امنح كل بند في الفاتورة رقماً فريداً"
+  },
+  {
+    "code": "invoice.line.exemption_reason_missing",
+    "field": "lines[0].exemption_reason",
+    "message_en": "An exemption reason is required for category 'E' lines",
+    "message_ar": "سبب الإعفاء مطلوب لبنود الفئة 'E'",
+    "suggestion_en": "State why this line is exempt or subject to reverse charge",
+    "suggestion_ar": "اذكر سبب إعفاء هذا البند أو خضوعه للاحتساب العكسي"
+  }
+]

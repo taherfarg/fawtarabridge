@@ -1,0 +1,50 @@
+[
+  {
+    "code": "invoice.number_missing",
+    "field": "invoice_number",
+    "message_en": "Invoice number is required",
+    "message_ar": "رقم الفاتورة مطلوب",
+    "suggestion_en": "Enter a unique invoice number",
+    "suggestion_ar": "أدخل رقم فاتورة فريداً"
+  },
+  {
+    "code": "invoice.supplier_name_missing",
+    "field": "supplier.name",
+    "message_en": "Supplier name is required",
+    "message_ar": "اسم المورّد مطلوب",
+    "suggestion_en": null,
+    "suggestion_ar": null
+  },
+  {
+    "code": "invoice.supplier_trn_missing",
+    "field": "supplier.trn",
+    "message_en": "Supplier TRN is required",
+    "message_ar": "رقم التسجيل الضريبي للمورّد مطلوب",
+    "suggestion_en": "Enter your 15-digit tax registration number from your company settings",
+    "suggestion_ar": "أدخل رقم التسجيل الضريبي المكوّن من 15 رقماً من إعدادات شركتك"
+  },
+  {
+    "code": "invoice.buyer_name_missing",
+    "field": "buyer.name",
+    "message_en": "Buyer name is required",
+    "message_ar": "اسم المشتري مطلوب",
+    "suggestion_en": null,
+    "suggestion_ar": null
+  },
+  {
+    "code": "invoice.buyer_trn_missing",
+    "field": "buyer.trn",
+    "message_en": "Buyer TRN is required",
+    "message_ar": "رقم التسجيل الضريبي للمشتري مطلوب",
+    "suggestion_en": "Ask your customer for their 15-digit tax registration number",
+    "suggestion_ar": "اطلب من عميلك رقم التسجيل الضريبي المكوّن من 15 رقماً"
+  },
+  {
+    "code": "invoice.lines_empty",
+    "field": "lines",
+    "message_en": "The invoice must contain at least one line",
+    "message_ar": "يجب أن تحتوي الفاتورة على بند واحد على الأقل",
+    "suggestion_en": null,
+    "suggestion_ar": null
+  }
+]

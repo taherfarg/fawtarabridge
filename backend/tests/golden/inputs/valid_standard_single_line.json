@@ -1,0 +1,40 @@
+{
+  "invoice_number": "INV-2026-0001",
+  "issue_date": "2026-05-15",
+  "due_date": "2026-06-14",
+  "currency": "AED",
+  "note": "Payment within 30 days",
+  "supplier": {
+    "name": "Al Noor Trading LLC",
+    "name_ar": "شركة النور للتجارة ذ.م.م",
+    "trn": "100123456700001",
+    "peppol_id": "0235:100123456700001",
+    "address": {
+      "street": "Sheikh Zayed Road",
+      "city": "Dubai",
+      "emirate": "Dubai",
+      "country_code": "AE"
+    }
+  },
+  "buyer": {
+    "name": "Gulf Builders LLC",
+    "trn": "100765432100002",
+    "address": {
+      "city": "Abu Dhabi",
+      "emirate": "Abu Dhabi"
+    }
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Steel pipes 2-inch",
+      "quantity": "10",
+      "unit_price": "100.00",
+      "vat_category": "S",
+      "vat_rate": "5"
+    }
+  ],
+  "declared_total_excluding_vat": "1000.00",
+  "declared_total_vat": "50.00",
+  "declared_total_including_vat": "1050.00"
+}

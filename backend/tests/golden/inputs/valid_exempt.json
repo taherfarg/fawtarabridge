@@ -1,0 +1,25 @@
+{
+  "invoice_number": "RNT-2026-0301",
+  "issue_date": "2026-03-01",
+  "currency": "AED",
+  "supplier": {
+    "name": "Marina Heights Properties LLC",
+    "trn": "100555666700001"
+  },
+  "buyer": {
+    "name": "Khalid Real Estate Brokerage",
+    "trn": "100444555600002"
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Residential apartment lease — March 2026",
+      "description_ar": "إيجار شقة سكنية — مارس 2026",
+      "quantity": "1",
+      "unit_price": "8500",
+      "vat_category": "E",
+      "vat_rate": "0",
+      "exemption_reason": "Exempt supply — residential lease (Article 46, Federal Decree-Law No. 8 of 2017)"
+    }
+  ]
+}

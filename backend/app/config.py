@@ -26,6 +26,9 @@ class Settings(BaseSettings):
 
     default_locale: str = "ar"
 
+    # SPEC-CHECK: align with the official MoF spec version identifier once published.
+    pintae_default_spec_version: str = "pint-ae-1.0"
+
     cors_origins: list[str] = ["http://localhost:5173"]
 
 

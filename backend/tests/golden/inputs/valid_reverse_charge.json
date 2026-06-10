@@ -1,0 +1,34 @@
+{
+  "invoice_number": "SRV-2026-0099",
+  "issue_date": "2026-05-28",
+  "due_date": "2026-06-27",
+  "currency": "AED",
+  "note": "VAT to be accounted for by the recipient under the reverse charge mechanism",
+  "supplier": {
+    "name": "Gulf Cloud Consulting FZ-LLC",
+    "trn": "100666777800001",
+    "address": {
+      "city": "Dubai",
+      "emirate": "Dubai"
+    }
+  },
+  "buyer": {
+    "name": "Oasis Manufacturing LLC",
+    "trn": "100999888700002",
+    "address": {
+      "city": "Ajman",
+      "emirate": "Ajman"
+    }
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Imported software licensing — annual subscription",
+      "quantity": "1",
+      "unit_price": "5000",
+      "vat_category": "AE",
+      "vat_rate": "0",
+      "exemption_reason": "Reverse charge — imported services (Article 48, Federal Decree-Law No. 8 of 2017)"
+    }
+  ]
+}

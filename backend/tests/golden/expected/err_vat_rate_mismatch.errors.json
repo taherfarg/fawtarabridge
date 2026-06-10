@@ -1,0 +1,10 @@
+[
+  {
+    "code": "invoice.line.vat_rate_mismatch",
+    "field": "lines[0].vat_rate",
+    "message_en": "VAT rate 12% does not match category 'S' (expected 5%)",
+    "message_ar": "نسبة الضريبة 12% لا تطابق الفئة 'S' (النسبة الصحيحة 5%)",
+    "suggestion_en": "Use 5% for standard-rated lines and 0% for zero-rated, exempt and reverse-charge lines",
+    "suggestion_ar": "استخدم 5% للبنود الخاضعة للنسبة الأساسية و0% للبنود الخاضعة لنسبة الصفر أو المعفاة أو الخاضعة للاحتساب العكسي"
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "invoice_number": "INV-2026-0008",
+  "issue_date": "2026-05-15",
+  "currency": "AED",
+  "supplier": {
+    "name": "Marina Heights Properties LLC",
+    "trn": "100555666700001"
+  },
+  "buyer": {
+    "name": "Khalid Real Estate Brokerage",
+    "trn": "100444555600002"
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Residential lease — May 2026",
+      "quantity": "1",
+      "unit_price": "8500",
+      "vat_category": "E",
+      "vat_rate": "0"
+    },
+    {
+      "line_id": "1",
+      "description": "Maintenance fee",
+      "quantity": "1",
+      "unit_price": "500",
+      "vat_category": "S",
+      "vat_rate": "5"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "invoice_number": "INV-2026-0003",
+  "issue_date": "2026-05-15",
+  "currency": "AED",
+  "supplier": {
+    "name": "Al Noor Trading LLC",
+    "trn": "100123456700001"
+  },
+  "buyer": {
+    "name": "Walk-in Customer"
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Steel pipes 2-inch",
+      "quantity": "10",
+      "unit_price": "100.00",
+      "vat_category": "S",
+      "vat_rate": "5"
+    }
+  ]
+}

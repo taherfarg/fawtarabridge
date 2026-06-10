@@ -86,6 +86,100 @@
       "password_weak": {
         "message": "Password must be at least {min_length} characters"
       }
+    },
+    "invoice": {
+      "number_missing": {
+        "message": "Invoice number is required",
+        "suggestion": "Enter a unique invoice number"
+      },
+      "type_code_unsupported": {
+        "message": "Invoice type code '{code}' is not supported — only 380 (commercial invoice)",
+        "suggestion": "Credit notes and other document types will be supported in a later release"
+      },
+      "currency_unsupported": {
+        "message": "Currency '{currency}' is not supported — invoices must be issued in AED",
+        "suggestion": "Convert the amounts to AED before submitting"
+      },
+      "due_date_before_issue": {
+        "message": "Due date {due_date} is before the issue date {issue_date}",
+        "suggestion": "Correct the due date or the issue date"
+      },
+      "supplier_name_missing": {
+        "message": "Supplier name is required"
+      },
+      "supplier_trn_missing": {
+        "message": "Supplier TRN is required",
+        "suggestion": "Enter your 15-digit tax registration number from your company settings"
+      },
+      "supplier_trn_invalid": {
+        "message": "Supplier TRN '{value}' must be exactly 15 digits",
+        "suggestion": "Enter the number exactly as it appears on the tax registration certificate"
+      },
+      "buyer_name_missing": {
+        "message": "Buyer name is required"
+      },
+      "buyer_trn_missing": {
+        "message": "Buyer TRN is required",
+        "suggestion": "Ask your customer for their 15-digit tax registration number"
+      },
+      "buyer_trn_invalid": {
+        "message": "Buyer TRN '{value}' must be exactly 15 digits",
+        "suggestion": "Enter the number exactly as it appears on the buyer's tax registration certificate"
+      },
+      "lines_empty": {
+        "message": "The invoice must contain at least one line"
+      },
+      "line": {
+        "id_missing": {
+          "message": "Line ID is required"
+        },
+        "duplicate_id": {
+          "message": "Line ID '{line_id}' is used more than once",
+          "suggestion": "Give every invoice line a unique ID"
+        },
+        "description_missing": {
+          "message": "Line description is required"
+        },
+        "quantity_invalid": {
+          "message": "Quantity must be greater than zero (got {actual})"
+        },
+        "price_invalid": {
+          "message": "Unit price cannot be negative (got {actual})"
+        },
+        "discount_invalid": {
+          "message": "Discount must be between zero and the line amount (got {actual})"
+        },
+        "vat_rate_mismatch": {
+          "message": "VAT rate {actual}% does not match category '{category}' (expected {expected}%)",
+          "suggestion": "Use 5% for standard-rated lines and 0% for zero-rated, exempt and reverse-charge lines"
+        },
+        "exemption_reason_missing": {
+          "message": "An exemption reason is required for category '{category}' lines",
+          "suggestion": "State why this line is exempt or subject to reverse charge"
+        }
+      },
+      "calc": {
+        "line_net_mismatch": {
+          "message": "Line net amount {actual} does not match quantity × price − discount = {expected}",
+          "suggestion": "Correct the line amount or the quantity, price and discount"
+        },
+        "line_vat_mismatch": {
+          "message": "Line VAT amount {actual} does not match the computed VAT {expected}",
+          "suggestion": "Correct the VAT amount or the line values"
+        },
+        "total_excl_mismatch": {
+          "message": "Total excluding VAT {actual} does not match the sum of line amounts {expected}",
+          "suggestion": "Correct the total or the invoice lines"
+        },
+        "total_vat_mismatch": {
+          "message": "VAT total {actual} does not match the computed VAT {expected}",
+          "suggestion": "Correct the VAT total or the invoice lines"
+        },
+        "total_incl_mismatch": {
+          "message": "Total including VAT {actual} does not match the computed total {expected}",
+          "suggestion": "Correct the total or the invoice lines"
+        }
+      }
     }
   },
   "roles": {

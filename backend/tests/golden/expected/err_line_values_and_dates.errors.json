@@ -1,0 +1,34 @@
+[
+  {
+    "code": "invoice.due_date_before_issue",
+    "field": "due_date",
+    "message_en": "Due date 2026-05-01 is before the issue date 2026-05-15",
+    "message_ar": "تاريخ الاستحقاق 2026-05-01 يسبق تاريخ الإصدار 2026-05-15",
+    "suggestion_en": "Correct the due date or the issue date",
+    "suggestion_ar": "صحّح تاريخ الاستحقاق أو تاريخ الإصدار"
+  },
+  {
+    "code": "invoice.line.quantity_invalid",
+    "field": "lines[0].quantity",
+    "message_en": "Quantity must be greater than zero (got 0)",
+    "message_ar": "الكمية يجب أن تكون أكبر من صفر (القيمة المدخلة 0)",
+    "suggestion_en": null,
+    "suggestion_ar": null
+  },
+  {
+    "code": "invoice.line.price_invalid",
+    "field": "lines[1].unit_price",
+    "message_en": "Unit price cannot be negative (got -5)",
+    "message_ar": "سعر الوحدة لا يمكن أن يكون سالباً (القيمة المدخلة -5)",
+    "suggestion_en": null,
+    "suggestion_ar": null
+  },
+  {
+    "code": "invoice.line.discount_invalid",
+    "field": "lines[2].discount_amount",
+    "message_en": "Discount must be between zero and the line amount (got 500)",
+    "message_ar": "الخصم يجب أن يكون بين صفر ومبلغ البند (القيمة المدخلة 500)",
+    "suggestion_en": null,
+    "suggestion_ar": null
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "invoice_number": "EXP-2026-0007",
+  "issue_date": "2026-04-02",
+  "currency": "AED",
+  "supplier": {
+    "name": "Dunes Dates Factory LLC",
+    "trn": "100333444500001",
+    "address": {
+      "city": "Al Ain",
+      "emirate": "Abu Dhabi"
+    }
+  },
+  "buyer": {
+    "name": "Doha Foods Trading WLL",
+    "trn": "100111222300009",
+    "address": {
+      "city": "Dubai",
+      "emirate": "Dubai"
+    }
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Premium Khalas dates 5kg box (export)",
+      "description_ar": "تمور خلاص فاخرة، عبوة 5 كجم (تصدير)",
+      "quantity": "5",
+      "unit_price": "40",
+      "vat_category": "Z",
+      "vat_rate": "0"
+    },
+    {
+      "line_id": "2",
+      "description": "Sea freight to Hamad Port (zero-rated international transport)",
+      "quantity": "1",
+      "unit_price": "300",
+      "vat_category": "Z",
+      "vat_rate": "0"
+    }
+  ],
+  "declared_total_excluding_vat": "500.00",
+  "declared_total_vat": "0.00",
+  "declared_total_including_vat": "500.00"
+}

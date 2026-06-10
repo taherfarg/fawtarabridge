@@ -1,0 +1,41 @@
+{
+  "invoice_number": "INV-2026-0009",
+  "issue_date": "2026-05-15",
+  "due_date": "2026-05-01",
+  "currency": "AED",
+  "supplier": {
+    "name": "Al Noor Trading LLC",
+    "trn": "100123456700001"
+  },
+  "buyer": {
+    "name": "Gulf Builders LLC",
+    "trn": "100765432100002"
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Steel pipes 2-inch",
+      "quantity": "0",
+      "unit_price": "10",
+      "vat_category": "S",
+      "vat_rate": "5"
+    },
+    {
+      "line_id": "2",
+      "description": "Adjustment line",
+      "quantity": "1",
+      "unit_price": "-5",
+      "vat_category": "S",
+      "vat_rate": "5"
+    },
+    {
+      "line_id": "3",
+      "description": "Cement bags 50kg",
+      "quantity": "1",
+      "unit_price": "100",
+      "discount_amount": "500",
+      "vat_category": "S",
+      "vat_rate": "5"
+    }
+  ]
+}
