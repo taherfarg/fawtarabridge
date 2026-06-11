@@ -43,6 +43,47 @@
       },
       "not_found": {
         "message": "Company not found"
+      },
+      "asp_already_registered": {
+        "message": "Peppol registration is already in progress or completed"
+      }
+    },
+    "webhook": {
+      "invalid_signature": {
+        "message": "Webhook signature verification failed"
+      },
+      "unknown_message": {
+        "message": "No transmission matches this callback"
+      }
+    },
+    "rejection": {
+      "buyer_trn_not_registered": {
+        "message": "The buyer's TRN is not registered with the FTA ({code})",
+        "suggestion": "Verify the buyer's TRN with your customer, correct it, then resend"
+      },
+      "supplier_trn_not_registered": {
+        "message": "Your TRN is not registered with the FTA ({code})",
+        "suggestion": "Check your tax registration status in your company settings"
+      },
+      "totals_inconsistent": {
+        "message": "The invoice totals were rejected as inconsistent ({code})",
+        "suggestion": "Re-check line amounts, discounts and VAT, then resend"
+      },
+      "vat_breakdown_invalid": {
+        "message": "The VAT breakdown was rejected ({code})",
+        "suggestion": "Check the VAT category and rate on each line, then resend"
+      },
+      "receiver_unreachable": {
+        "message": "The buyer could not be reached on the Peppol network ({code})",
+        "suggestion": "Confirm the buyer's electronic address, or try again later"
+      },
+      "schema_invalid": {
+        "message": "The invoice document failed schema validation ({code})",
+        "suggestion": "Contact support — this indicates a system problem, not a data problem"
+      },
+      "unknown": {
+        "message": "The invoice was rejected: {reason} (code {code})",
+        "suggestion": "Review the rejection details and contact support if unclear"
       }
     },
     "member": {
@@ -148,6 +189,17 @@
       "not_editable": {
         "message": "This invoice can no longer be edited (status: {status})",
         "suggestion": "Use the fix-and-resend flow for transmitted invoices"
+      },
+      "not_validatable": {
+        "message": "This invoice cannot be validated in its current state (status: {status})"
+      },
+      "not_sendable": {
+        "message": "This invoice cannot be sent (status: {status})",
+        "suggestion": "Validate the invoice first; only validated invoices can be sent"
+      },
+      "not_resendable": {
+        "message": "This invoice cannot be resent (status: {status})",
+        "suggestion": "Resend is only available after a rejection or a transmission error"
       },
       "possible_duplicate": {
         "message": "Possible duplicate: an invoice with the same buyer and amount exists within 3 days ({matches})",

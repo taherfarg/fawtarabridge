@@ -2,7 +2,17 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import register_exception_handlers
-from app.api.routes import auth, contacts, health, imports, invoices, tenants, users
+from app.api.routes import (
+    auth,
+    contacts,
+    health,
+    imports,
+    invoices,
+    tenants,
+    transmissions,
+    users,
+    webhooks,
+)
 from app.config import get_settings
 
 
@@ -28,6 +38,8 @@ def create_app() -> FastAPI:
     api_v1.include_router(contacts.router)
     api_v1.include_router(invoices.router)
     api_v1.include_router(imports.router)
+    api_v1.include_router(transmissions.router)
+    api_v1.include_router(webhooks.router)
     app.include_router(api_v1)
     app.include_router(health.router)
 

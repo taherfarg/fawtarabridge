@@ -24,3 +24,8 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         default=RevenueBand.UNKNOWN,
     )
     status: Mapped[str] = mapped_column(String(20), default="active")
+    # Peppol participant onboarding via the ASP (FR-1.3); set by the worker task.
+    asp_participant_id: Mapped[str | None] = mapped_column(String(100))
+    asp_onboarding_status: Mapped[str] = mapped_column(
+        String(20), default="not_started"
+    )  # not_started | pending | registered | failed

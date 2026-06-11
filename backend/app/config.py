@@ -29,6 +29,13 @@ class Settings(BaseSettings):
     # SPEC-CHECK: align with the official MoF spec version identifier once published.
     pintae_default_spec_version: str = "pint-ae-1.0"
 
+    asp_provider: str = "mock"
+    asp_webhook_secret: str = "dev-webhook-secret-change-me-0123456789"
+    transmission_max_attempts: int = 5
+    transmission_backoff_base_seconds: int = 30
+
+    celery_eager: bool = False  # tests run tasks inline
+
     cors_origins: list[str] = ["http://localhost:5173"]
 
 

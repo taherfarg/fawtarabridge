@@ -28,6 +28,7 @@ APP_TEST_URL = f"postgresql+psycopg://fawtara_app:fawtara_app@{DB_HOST}:{DB_PORT
 # Must happen before any `app.*` import (pytest imports conftest first).
 os.environ["FAWTARA_DATABASE_URL"] = APP_TEST_URL
 os.environ["FAWTARA_ADMIN_DATABASE_URL"] = ADMIN_TEST_URL
+os.environ["FAWTARA_CELERY_EAGER"] = "true"  # tasks run inline in tests
 
 import uuid  # noqa: E402
 from collections.abc import Callable  # noqa: E402
@@ -47,7 +48,7 @@ from app.services.otp import get_otp_provider  # noqa: E402
 SessionFactory = Callable[[], Session]
 
 ALL_TABLES = (
-    "import_mapping_templates, invoices, contacts, "
+    "audit_events, transmissions, import_mapping_templates, invoices, contacts, "
     "otp_codes, refresh_tokens, tenant_memberships, tenants, users"
 )
 
@@ -78,6 +79,15 @@ def clean_db(database: None, admin_engine: Engine) -> Iterator[None]:
     yield
     with admin_engine.begin() as conn:
         conn.execute(text(f"TRUNCATE {ALL_TABLES} CASCADE"))
+
+
+@pytest.fixture(autouse=True)
+def reset_mock_asp() -> Iterator[None]:
+    from app.asp.mock import MockASPAdapter
+
+    MockASPAdapter.reset()
+    yield
+    MockASPAdapter.reset()
 
 
 @pytest.fixture()

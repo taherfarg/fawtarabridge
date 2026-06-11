@@ -3,15 +3,15 @@ from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Response
-from fastapi.responses import JSONResponse
 
 from app.api.deps import AuthContext, AuthDep, TenantDbDep, require_roles
 from app.core.errors import AppError
 from app.models import Contact, Invoice, Tenant
 from app.models.enums import Role
-from app.pintae import InvoiceValidationError, get_engine
+from app.pintae import get_engine
 from app.repositories.contacts import ContactRepository
 from app.repositories.invoices import InvoiceRepository
+from app.repositories.transmissions import TransmissionRepository
 from app.schemas.invoice import (
     InvoiceCreateIn,
     InvoiceCreateOut,
@@ -20,7 +20,9 @@ from app.schemas.invoice import (
     InvoiceOut,
     ValidationReportOut,
 )
-from app.services import invoice_service
+from app.schemas.transmission import AuditEventOut, SendOut, TransmissionOut
+from app.services import audit_service, invoice_service, transmission_service
+from app.worker.tasks import transmit_invoice
 
 router = APIRouter(prefix="/invoices", tags=["invoices"])
 
@@ -101,11 +103,18 @@ def get_invoice(invoice_id: uuid.UUID, db: TenantDbDep, ctx: AuthDep) -> Invoice
     canonical = invoice_service.rehydrate(invoice)
     errors = get_engine().validate(canonical)
     _, warnings = invoice_service.duplicate_warnings(repo, canonical, exclude_id=invoice.id)
+    transmissions = TransmissionRepository(db, ctx.tenant_id).list_for_invoice(invoice.id)
+    latest = (
+        TransmissionOut.from_model(transmissions[0]).model_dump(mode="json")
+        if transmissions
+        else None
+    )
     return InvoiceDetailOut(
         **InvoiceOut.model_validate(invoice).model_dump(),
         canonical=canonical,
         errors=errors,
         warnings=warnings,
+        latest_transmission=latest,
     )
 
 
@@ -119,7 +128,7 @@ def update_invoice(
     contact = _contact_or_404(db, ctx, payload)
     canonical = invoice_service.build_canonical(tenant, payload, contact)
     invoice, errors, warnings = invoice_service.update_invoice(
-        db, repo, invoice, canonical, contact_id=payload.buyer_contact_id
+        db, repo, invoice, canonical, contact_id=payload.buyer_contact_id, actor_id=ctx.user_id
     )
     return InvoiceCreateOut(
         invoice=InvoiceOut.model_validate(invoice), errors=errors, warnings=warnings
@@ -130,7 +139,7 @@ def update_invoice(
 def validate_invoice(invoice_id: uuid.UUID, db: TenantDbDep, ctx: WriteCtx) -> ValidationReportOut:
     repo = InvoiceRepository(db, ctx.tenant_id)
     invoice = _get_or_404(repo, invoice_id)
-    errors = invoice_service.validate_invoice(invoice)
+    errors = invoice_service.validate_invoice(db, invoice, actor_id=ctx.user_id)
     _, warnings = invoice_service.duplicate_warnings(
         repo, invoice_service.rehydrate(invoice), exclude_id=invoice.id
     )
@@ -142,16 +151,62 @@ def validate_invoice(invoice_id: uuid.UUID, db: TenantDbDep, ctx: WriteCtx) -> V
     )
 
 
+def _queue_and_dispatch(
+    db: TenantDbDep, ctx: AuthContext, invoice: Invoice, *, resend: bool
+) -> SendOut:
+    transmission = transmission_service.queue_transmission(
+        db, invoice, actor_id=ctx.user_id, resend=resend
+    )
+    out = SendOut(
+        invoice_id=invoice.id,
+        invoice_status=invoice.status,
+        transmission=TransmissionOut.from_model(transmission),
+    )
+    # Commit BEFORE enqueueing: the worker opens its own session and must see the
+    # row (in eager test mode the task runs inline right here).
+    db.commit()
+    transmit_invoice.delay(str(transmission.id), str(ctx.tenant_id))
+    return out
+
+
+@router.post("/{invoice_id}/send", response_model=SendOut, status_code=202)
+def send_invoice(invoice_id: uuid.UUID, db: TenantDbDep, ctx: WriteCtx) -> SendOut:
+    """Queue transmission to the ASP (architecture rule 4: never synchronous)."""
+    invoice = _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)
+    return _queue_and_dispatch(db, ctx, invoice, resend=False)
+
+
+@router.post("/{invoice_id}/resend", response_model=SendOut, status_code=202)
+def resend_invoice(invoice_id: uuid.UUID, db: TenantDbDep, ctx: WriteCtx) -> SendOut:
+    """Re-queue a REJECTED/ERROR invoice unchanged (fix-and-resend goes via PUT)."""
+    invoice = _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)
+    return _queue_and_dispatch(db, ctx, invoice, resend=True)
+
+
+@router.get("/{invoice_id}/audit", response_model=list[AuditEventOut])
+def invoice_audit_trail(
+    invoice_id: uuid.UUID, db: TenantDbDep, ctx: AuthDep
+) -> list[AuditEventOut]:
+    _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)
+    events = audit_service.list_for_entity(
+        db, ctx.tenant_id, entity_type="invoice", entity_id=invoice_id
+    )
+    return [AuditEventOut.model_validate(e) for e in events]
+
+
+@router.get("/{invoice_id}/transmissions", response_model=list[TransmissionOut])
+def invoice_transmissions(
+    invoice_id: uuid.UUID, db: TenantDbDep, ctx: AuthDep
+) -> list[TransmissionOut]:
+    _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)
+    rows = TransmissionRepository(db, ctx.tenant_id).list_for_invoice(invoice_id)
+    return [TransmissionOut.from_model(t) for t in rows]
+
+
 @router.get("/{invoice_id}/xml")
 def download_xml(invoice_id: uuid.UUID, db: TenantDbDep, ctx: AuthDep) -> Response:
     invoice = _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)
-    try:
-        xml = invoice_service.generate_xml(invoice)
-    except InvoiceValidationError as exc:
-        return JSONResponse(
-            status_code=422,
-            content={"errors": [e.model_dump() for e in exc.errors]},
-        )
+    xml = invoice_service.generate_xml(invoice)  # InvoiceValidationError -> 422 envelope
     return Response(
         content=xml,
         media_type="application/xml",

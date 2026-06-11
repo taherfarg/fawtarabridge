@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.errors import AppError, ErrorDetail, build_error_detail
 from app.core.i18n import t
+from app.pintae import InvoiceValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -62,4 +63,14 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=422,
             content={"errors": [d.model_dump() for d in details]},
+        )
+
+    @app.exception_handler(InvoiceValidationError)
+    async def invoice_validation_handler(
+        request: Request, exc: InvoiceValidationError
+    ) -> JSONResponse:
+        """The engine refused to generate/queue invalid content: full bilingual report."""
+        return JSONResponse(
+            status_code=422,
+            content={"errors": [e.model_dump() for e in exc.errors]},
         )

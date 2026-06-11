@@ -75,6 +75,8 @@ class InvoiceDetailOut(InvoiceOut):
     canonical: CanonicalInvoice
     errors: list[ErrorDetail]
     warnings: list[ErrorDetail]
+    # Avoids a circular import; serialized via the TransmissionOut model at the route.
+    latest_transmission: dict | None = None
 
 
 class InvoiceCreateOut(BaseModel):

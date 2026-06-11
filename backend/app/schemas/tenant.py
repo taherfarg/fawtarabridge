@@ -39,3 +39,5 @@ class TenantOut(BaseModel):
     address: str | None
     revenue_band: RevenueBand
     status: str
+    asp_participant_id: str | None = None
+    asp_onboarding_status: str = "not_started"

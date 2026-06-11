@@ -240,3 +240,63 @@ The promised invoice-level RLS test now exists:
 isolation tests for contacts and invoices.
 
 No new SPEC-CHECK items in M3 (intake is not spec-bound; the M2 register stands).
+
+---
+
+## M4 — Transmission & lifecycle (2026-06-11)
+
+### D-033 · State machine extensions beyond the spec'd happy path
+The instructed lifecycle (DRAFT→VALIDATED→QUEUED→SENT→ACCEPTED|REJECTED|ERROR)
+is extended with recovery edges: VALIDATED→DRAFT (edit/re-validation failure),
+REJECTED→DRAFT|QUEUED and ERROR→DRAFT|QUEUED (fix-and-resend / direct resend /
+dead-letter replay). ACCEPTED is terminal. The transition table is asserted
+exhaustively for all 49 (from,to) pairs, and `transition_invoice` is the only
+legal way to change a status — it writes the audit event atomically.
+
+### D-034 · Audit immutability enforced by PostgreSQL privileges
+`audit_events` has SELECT+INSERT grants only for the app role — UPDATE/DELETE
+are *impossible* even for buggy or compromised app code, not merely "not
+implemented". Tested (`permission denied`). Events carry actor_id, actor_type
+(user/system/asp_webhook), before/after JSON and a server timestamp.
+
+### D-035 · Idempotency model
+The API refuses double-queueing via the state machine (only VALIDATED can be
+sent). Each transmission carries `idempotency_key =
+"<tenant>:<invoice>:<xml-hash16>:<ordinal>"` to the ASP, so broker re-deliveries
+and network retries can never double-deliver (mock dedupes on it; real ASPs
+support the same). Re-executing a finalized transmission is a no-op
+(`task_acks_late` + at-least-once semantics). The tenant prefix doubles as the
+webhook's RLS context — no bypass role exists for callbacks either.
+
+### D-036 · Retry/backoff/dead-letter mechanics
+`execute_transmission` is a plain function (unit-testable without a broker); the
+Celery task only schedules retries with exponential backoff (30s·2^n, capped at
+30 min). Transient ASP errors retry up to `transmission_max_attempts` (5), then
+the transmission dead-letters and the invoice transitions to ERROR. Permanent
+errors and engine validation failures fail immediately (no retry). Dead-lettered
+and failed transmissions are visible at `GET /transmissions/dead-letter`
+(OWNER/ACCOUNTANT); recovery = fix+send or direct resend. The internal admin
+console (FR-9) will add the cross-tenant view later.
+
+### D-037 · Worker RLS context
+Tasks receive `(transmission_id, tenant_id)` and open `tenant_session(tenant_id)`
+— the worker operates under the same RLS policies as the API; there is no
+superuser path in the runtime. Tasks are enqueued only after the API commits
+(visible row for the worker; in eager test mode the task runs inline).
+
+### D-038 · Mock ASP behavior keyed on receiver TRN suffix
+…99 → reject BR-AE-02 · …98 → reject BR-CO-15 · …97 → transient error ·
+…96 → permanent error · …94 → stays processing (webhook completes it) · else
+accepted. Deterministic, demoable, and exercises every lifecycle path.
+
+### D-039 · Webhook contract (until the real ASP defines one)
+HMAC-SHA256 over the raw body in `X-ASP-Signature` (constant-time compare,
+shared secret in settings). Payload carries our idempotency_key + status (+
+rejection code/reason). Duplicate callbacks are acknowledged as "ignored".
+SPEC-CHECK: adapt signing + payload to the contracted ASP's scheme.
+
+### SPEC-CHECK register (M4 additions)
+11. Rejection-code list is EN 16931/Peppol BR-*-style placeholder — replace with
+    the contracted ASP/FTA code list (asp/rejections.py, asp/mock.py).
+12. Peppol participant scheme "0235:<TRN>" placeholder (asp/mock.py).
+13. Webhook signing scheme per real ASP (asp/webhook.py).

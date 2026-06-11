@@ -7,6 +7,8 @@ commit/rollback — a connection returned to the pool carries no tenant context.
 """
 
 import uuid
+from collections.abc import Iterator
+from contextlib import contextmanager
 from functools import lru_cache
 
 from sqlalchemy import Engine, create_engine, text
@@ -46,3 +48,22 @@ def set_rls_context(
             "uid": str(user_id) if user_id else "",
         },
     )
+
+
+@contextmanager
+def tenant_session(tenant_id: uuid.UUID) -> Iterator[Session]:
+    """One tenant-scoped transaction outside a request (Celery workers).
+
+    Commits on success; the GUC dies with the transaction, so callers needing
+    further DB work must open a new tenant_session block.
+    """
+    session = get_sessionmaker()()
+    try:
+        set_rls_context(session, tenant_id=tenant_id)
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()

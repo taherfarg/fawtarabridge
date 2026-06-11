@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from app.api.errors import _PYDANTIC_TYPE_TO_CODE
+from app.asp.rejections import REJECTION_ERROR_CODES
 from app.core.i18n import t
 from app.intake.importer import IMPORT_ERROR_CODES
 from app.pintae.v1.rules import ERROR_CODES as PINTAE_V1_ERROR_CODES
@@ -18,6 +19,7 @@ def _collect_codes() -> set[str]:
     codes.update(PINTAE_V1_ERROR_CODES)
     codes.update(IMPORT_ERROR_CODES)
     codes.update(SERVICE_ERROR_CODES)
+    codes.update(REJECTION_ERROR_CODES)
     for path in APP_DIR.rglob("*.py"):
         codes.update(APP_ERROR_RE.findall(path.read_text(encoding="utf-8")))
     codes.add("validation.invalid")  # generic fallback used by the validation handler

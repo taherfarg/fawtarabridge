@@ -11,15 +11,19 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, ErrorDetail, build_error_detail
+from app.lifecycle.state_machine import InvoiceStatus, transition_invoice
 from app.models import Contact, Invoice, Tenant
 from app.pintae import CanonicalInvoice, get_engine
 from app.pintae.canonical import Address, InvoiceLine, Party
 from app.repositories.invoices import InvoiceRepository
 from app.schemas.invoice import BuyerIn, InvoiceCreateIn
+from app.services import audit_service
 
-STATUS_DRAFT = "DRAFT"
-STATUS_VALIDATED = "VALIDATED"
-EDITABLE_STATUSES = (STATUS_DRAFT, STATUS_VALIDATED)
+# REJECTED/ERROR are editable on purpose: that's the fix-and-resend entry point.
+EDITABLE_STATUSES = frozenset(
+    {InvoiceStatus.DRAFT, InvoiceStatus.VALIDATED, InvoiceStatus.REJECTED, InvoiceStatus.ERROR}
+)
+VALIDATABLE_STATUSES = frozenset({InvoiceStatus.DRAFT, InvoiceStatus.VALIDATED})
 
 # Codes emitted via build_error_detail in this module (for the i18n catalog test).
 SERVICE_ERROR_CODES: frozenset[str] = frozenset({"invoice.possible_duplicate"})
@@ -152,7 +156,7 @@ def create_invoice(
 
     invoice = Invoice(
         invoice_number=canonical.invoice_number,
-        status=STATUS_DRAFT,
+        status=InvoiceStatus.DRAFT.value,
         buyer_contact_id=contact_id,
         duplicate_warning=is_duplicate,
         created_by=created_by,
@@ -167,6 +171,15 @@ def create_invoice(
         db.flush()
     except IntegrityError as exc:
         raise _translate_invoice_integrity_error(exc) from exc
+    audit_service.record(
+        db,
+        invoice.tenant_id,
+        action="invoice.created",
+        entity_type="invoice",
+        entity_id=invoice.id,
+        actor_id=created_by,
+        after={"invoice_number": invoice.invoice_number, "status": invoice.status},
+    )
     return invoice, errors, warnings
 
 
@@ -177,8 +190,10 @@ def update_invoice(
     canonical: CanonicalInvoice,
     *,
     contact_id: uuid.UUID | None,
+    actor_id: uuid.UUID,
 ) -> tuple[Invoice, list[ErrorDetail], list[ErrorDetail]]:
-    if invoice.status not in EDITABLE_STATUSES:
+    status = InvoiceStatus(invoice.status)
+    if status not in EDITABLE_STATUSES:
         raise AppError("invoice.not_editable", status_code=409, params={"status": invoice.status})
     engine = get_engine()
     errors = engine.validate(canonical)
@@ -187,13 +202,25 @@ def update_invoice(
     invoice.invoice_number = canonical.invoice_number
     invoice.buyer_contact_id = contact_id
     invoice.duplicate_warning = is_duplicate
-    invoice.status = STATUS_DRAFT  # any edit re-opens the draft
+    if status != InvoiceStatus.DRAFT:  # any edit re-opens the draft (fix-and-resend)
+        transition_invoice(
+            db, invoice, InvoiceStatus.DRAFT, actor_id=actor_id, extra={"reason": "edited"}
+        )
     invoice.spec_version = None
     _apply_denormalized(invoice, canonical)
     try:
         db.flush()
     except IntegrityError as exc:
         raise _translate_invoice_integrity_error(exc) from exc
+    audit_service.record(
+        db,
+        invoice.tenant_id,
+        action="invoice.updated",
+        entity_type="invoice",
+        entity_id=invoice.id,
+        actor_id=actor_id,
+        after={"invoice_number": invoice.invoice_number},
+    )
     return invoice, errors, warnings
 
 
@@ -201,15 +228,28 @@ def rehydrate(invoice: Invoice) -> CanonicalInvoice:
     return CanonicalInvoice.model_validate(invoice.canonical)
 
 
-def validate_invoice(invoice: Invoice) -> list[ErrorDetail]:
+def validate_invoice(db: Session, invoice: Invoice, *, actor_id: uuid.UUID) -> list[ErrorDetail]:
     """Run the engine; flip DRAFT<->VALIDATED accordingly and pin the spec version."""
+    status = InvoiceStatus(invoice.status)
+    if status not in VALIDATABLE_STATUSES:
+        raise AppError(
+            "invoice.not_validatable", status_code=409, params={"status": invoice.status}
+        )
     engine = get_engine()
     errors = engine.validate(rehydrate(invoice))
     if errors:
-        invoice.status = STATUS_DRAFT
+        if status == InvoiceStatus.VALIDATED:
+            transition_invoice(
+                db,
+                invoice,
+                InvoiceStatus.DRAFT,
+                actor_id=actor_id,
+                extra={"reason": "validation_failed"},
+            )
         invoice.spec_version = None
     else:
-        invoice.status = STATUS_VALIDATED
+        if status == InvoiceStatus.DRAFT:
+            transition_invoice(db, invoice, InvoiceStatus.VALIDATED, actor_id=actor_id)
         invoice.spec_version = engine.spec_version
     return errors
 
