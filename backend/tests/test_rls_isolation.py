@@ -6,6 +6,8 @@ access even if every application layer above it is buggy.
 """
 
 import uuid
+from datetime import date
+from decimal import Decimal
 
 import pytest
 from sqlalchemy import Engine, func, select, update
@@ -82,6 +84,53 @@ def test_user_arm_exposes_only_own_memberships(
 
     assert set(session.scalars(select(Tenant.id)).all()) == {tenant_a}
     assert set(session.scalars(select(TenantMembership.tenant_id)).all()) == {tenant_a}
+
+
+def test_tenant_a_can_never_read_tenant_b_invoices(
+    make_session: SessionFactory, two_tenants: TwoTenants
+) -> None:
+    """THE multi-tenancy promise (architecture rule 2), on the invoices table itself."""
+    from app.models import Invoice
+
+    (tenant_a, user_a), (tenant_b, user_b) = two_tenants
+
+    def insert_invoice(tenant_id: uuid.UUID, user_id: uuid.UUID, number: str) -> None:
+        session = make_session()
+        set_rls_context(session, tenant_id=tenant_id, user_id=user_id)
+        session.add(
+            Invoice(
+                tenant_id=tenant_id,
+                invoice_number=number,
+                canonical={},
+                issue_date=date(2026, 5, 15),
+                buyer_name="Buyer",
+                total_including_vat=Decimal("105.00"),
+                created_by=user_id,
+            )
+        )
+        session.commit()
+
+    insert_invoice(tenant_a, user_a, "A-1")
+    insert_invoice(tenant_b, user_b, "B-1")
+
+    session = make_session()
+    set_rls_context(session, tenant_id=tenant_a, user_id=user_a)
+    visible = list(session.scalars(select(Invoice.invoice_number)).all())
+    assert visible == ["A-1"]  # B-1 is invisible even via SELECT *
+
+    # Insert for the foreign tenant is refused by the database itself.
+    session.add(
+        Invoice(
+            tenant_id=tenant_b,
+            invoice_number="EVIL-1",
+            canonical={},
+            issue_date=date(2026, 5, 15),
+            buyer_name="X",
+            total_including_vat=Decimal("1.00"),
+        )
+    )
+    with pytest.raises(ProgrammingError, match="row-level security"):
+        session.flush()
 
 
 def test_accountant_spanning_tenants_sees_both(

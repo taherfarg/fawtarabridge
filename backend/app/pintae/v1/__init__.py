@@ -1,7 +1,7 @@
 from app.core.errors import ErrorDetail
-from app.pintae.base import InvoiceEngine
+from app.pintae.base import InvoiceEngine, InvoiceTotals
 from app.pintae.canonical import CanonicalInvoice
-from app.pintae.v1 import rules, serializer
+from app.pintae.v1 import calc, rules, serializer
 
 
 class PintAeV1Engine(InvoiceEngine):
@@ -14,3 +14,6 @@ class PintAeV1Engine(InvoiceEngine):
 
     def serialize(self, invoice: CanonicalInvoice) -> bytes:
         return serializer.serialize(invoice)
+
+    def totals(self, invoice: CanonicalInvoice) -> InvoiceTotals:
+        return calc.compute_totals(invoice)

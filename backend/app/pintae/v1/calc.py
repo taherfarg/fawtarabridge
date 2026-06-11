@@ -10,9 +10,9 @@ Rounding policy (v1):
   # SPEC-CHECK: confirm PINT-AE follows the EN 16931 per-category computation.
 """
 
-from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 
+from app.pintae.base import CategoryTotal, InvoiceTotals
 from app.pintae.canonical import CanonicalInvoice, InvoiceLine, VatCategory
 
 TWO_PLACES = Decimal("0.01")
@@ -47,25 +47,6 @@ def line_vat(line: InvoiceLine) -> Decimal:
     """Per-line VAT, informational (declared-value cross-checks). The
     authoritative tax total is per-category — see :func:`compute_totals`."""
     return round2(line_net(line) * line.vat_rate / Decimal("100"))
-
-
-@dataclass(frozen=True)
-class CategoryTotal:
-    category: VatCategory
-    rate: Decimal
-    taxable: Decimal
-    tax: Decimal
-    exemption_reason: str | None
-
-
-@dataclass(frozen=True)
-class InvoiceTotals:
-    line_extension: Decimal
-    tax_exclusive: Decimal
-    tax_total: Decimal
-    tax_inclusive: Decimal
-    payable: Decimal
-    by_category: list[CategoryTotal]
 
 
 def compute_totals(invoice: CanonicalInvoice) -> InvoiceTotals:

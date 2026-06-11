@@ -172,3 +172,71 @@ touching v1 (tested).
 9. Unit-price extra precision carried over from EN 16931 (serializer.py).
 10. Official spec version identifier ↔ internal `pint-ae-1.0` label (config.py,
     v1/__init__.py).
+
+---
+
+## M3 — Intake (2026-06-11)
+
+### D-024 · Supplier identity always derives from the tenant profile
+Neither the manual API nor the importer accepts supplier data: the supplier
+`Party` is built from the Tenant row (legal names, TRN, address). A client can
+never issue an invoice under a different supplier identity than their company
+profile. TRN corrections go through the admin flow (D-013).
+
+### D-025 · Drafts persist even when invalid; validation pins the spec version
+`POST /invoices` always saves a DRAFT and returns the bilingual error/warning
+lists alongside (incomplete drafts are a legitimate workflow state).
+`POST /invoices/{id}/validate` flips DRAFT→VALIDATED only when the engine is
+clean and pins `spec_version`; any `PUT` re-opens the DRAFT and clears it.
+Statuses stay limited to DRAFT/VALIDATED until the M4 state machine. There is no
+invoice DELETE endpoint (compliance product; PRD defines none).
+
+### D-026 · Import never guesses: fully explicit mapping
+The mapping payload carries the column names, an explicit `vat_value_map`
+("5%"→S, "exempt"→E, …) and an explicit `date_format` (default ISO). Unknown VAT
+values / unparseable dates / bad numbers are per-row bilingual errors — nothing
+is auto-detected or defaulted. Only mechanical normalization is applied:
+trimming, thousands separators in numbers, case-insensitive VAT-map keys. The
+VAT *rate* is derived from the category via the v1 rate table (deterministic,
+not a guess).
+
+### D-027 · Import is a stateless preview/commit pair with partial commit
+Both endpoints take file + mapping (or `template_id`); preview persists nothing.
+Commit creates every valid invoice as DRAFT and reports the rest — one broken row
+never blocks the batch. Each creation runs inside a SAVEPOINT so a constraint
+violation (duplicate number) cannot abort the surrounding transaction (found by
+test: Postgres poisons the transaction after any failed statement).
+`save_template_name` upserts the tenant's mapping template (wizard "save" UX).
+
+### D-028 · Row grouping & line numbering
+Rows sharing an invoice-number cell become one invoice's lines, in file order,
+auto-numbered "1"…"n". Header cells (date, buyer, declared totals…) must agree
+across the group — mismatch flags `import.inconsistent_invoice` for that invoice.
+Customer-facing row numbers are 1-based over data rows (header excluded).
+
+### D-029 · No silent contact enrichment in import
+The importer builds the buyer purely from file columns; it neither looks up nor
+creates contacts (deterministic, no surprise writes). The manual API links
+contacts explicitly via `buyer_contact_id`. A "link to contacts" assist can land
+in the M6 wizard UI.
+
+### D-030 · Contact model
+TRN optional at contact level (invoice-level rules enforce presence for B2B),
+unique per tenant when present (partial index → bilingual 409). Hard DELETE is
+allowed: invoices keep the full buyer snapshot inside their canonical JSON and
+`buyer_contact_id` is `ON DELETE SET NULL`.
+
+### D-031 · Duplicate detection (FR-2.5)
+Key = buyer TRN (fallback: exact buyer name) + identical gross total + issue date
+within ±3 days, computed against the engine's totals. Result is a warning
+(`invoice.possible_duplicate` naming the matched numbers, max 5) and a persisted
+`duplicate_warning` flag — creation is never blocked. Window is the fixed 3 days
+from the build instructions; per-tenant configurability (PRD "configurable
+window") is deferred to settings (M6/M7).
+
+### D-007 · Closed
+The promised invoice-level RLS test now exists:
+`test_tenant_a_can_never_read_tenant_b_invoices` (SQL-level) plus API-level
+isolation tests for contacts and invoices.
+
+No new SPEC-CHECK items in M3 (intake is not spec-bound; the M2 register stands).

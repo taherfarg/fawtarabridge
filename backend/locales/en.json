@@ -50,6 +50,56 @@
         "message": "This user is already a member of the company"
       }
     },
+    "contact": {
+      "not_found": {
+        "message": "Contact not found"
+      },
+      "trn_exists": {
+        "message": "A contact with this TRN already exists",
+        "suggestion": "Search your contacts for the existing entry instead of creating a duplicate"
+      }
+    },
+    "import": {
+      "file_unsupported": {
+        "message": "Unsupported file type: '{filename}' — upload a .csv or .xlsx file"
+      },
+      "file_empty": {
+        "message": "The file contains no data rows"
+      },
+      "too_many_rows": {
+        "message": "The file exceeds the limit of {limit} rows",
+        "suggestion": "Split the file and import it in batches"
+      },
+      "column_missing": {
+        "message": "Mapped column '{column}' was not found in the file",
+        "suggestion": "Check the column mapping against the file's header row"
+      },
+      "required_value_missing": {
+        "message": "Required value is missing (column '{column}')"
+      },
+      "bad_decimal": {
+        "message": "'{value}' is not a valid number"
+      },
+      "bad_date": {
+        "message": "'{value}' is not a valid date in the format {expected_format}",
+        "suggestion": "Adjust the date format in the mapping or fix the cell"
+      },
+      "vat_value_unknown": {
+        "message": "VAT value '{value}' is not recognized",
+        "suggestion": "Add it to the VAT value mapping (e.g. \"5%\" → standard rate)"
+      },
+      "inconsistent_invoice": {
+        "message": "Rows of the same invoice carry different values for '{column}'",
+        "suggestion": "All rows of one invoice must share the same header values"
+      },
+      "template_not_found": {
+        "message": "Mapping template not found"
+      },
+      "template_name_exists": {
+        "message": "A mapping template with this name already exists",
+        "suggestion": "Choose a different name or delete the old template first"
+      }
+    },
     "otp": {
       "not_found": {
         "message": "No active verification code",
@@ -88,6 +138,21 @@
       }
     },
     "invoice": {
+      "not_found": {
+        "message": "Invoice not found"
+      },
+      "number_exists": {
+        "message": "An invoice with this number already exists",
+        "suggestion": "Invoice numbers must be unique — pick the next free number"
+      },
+      "not_editable": {
+        "message": "This invoice can no longer be edited (status: {status})",
+        "suggestion": "Use the fix-and-resend flow for transmitted invoices"
+      },
+      "possible_duplicate": {
+        "message": "Possible duplicate: an invoice with the same buyer and amount exists within 3 days ({matches})",
+        "suggestion": "Check whether this invoice was already entered before sending it"
+      },
       "number_missing": {
         "message": "Invoice number is required",
         "suggestion": "Enter a unique invoice number"

@@ -1,5 +1,7 @@
 """Spec versioning: engines are isolated, additive, and selectable per version."""
 
+from decimal import Decimal
+
 import pytest
 
 from app.core.errors import ErrorDetail
@@ -11,6 +13,7 @@ from app.pintae import (
     get_engine,
     register_engine,
 )
+from app.pintae.base import InvoiceTotals
 from app.pintae.registry import _engines
 from app.pintae.v1 import PintAeV1Engine
 from tests.pintae_builders import make_invoice
@@ -41,6 +44,16 @@ class FakeV2Engine(InvoiceEngine):
 
     def serialize(self, invoice: CanonicalInvoice) -> bytes:
         return b"<fake/>"
+
+    def totals(self, invoice: CanonicalInvoice) -> InvoiceTotals:
+        return InvoiceTotals(
+            line_extension=Decimal("0"),
+            tax_exclusive=Decimal("0"),
+            tax_total=Decimal("0"),
+            tax_inclusive=Decimal("0"),
+            payable=Decimal("0"),
+            by_category=[],
+        )
 
 
 def test_second_version_registers_without_touching_v1() -> None:

@@ -18,6 +18,8 @@ dependencies = [
     "redis>=5.2",
     "lxml>=6.1.1",
     "xmlschema>=4.3.1",
+    "openpyxl>=3.1.5",
+    "python-multipart>=0.0.32",
 ]
 
 [dependency-groups]
@@ -28,6 +30,7 @@ dev = [
     "ruff>=0.9",
     "mypy>=1.14",
     "lxml-stubs>=0.5.1",
+    "types-openpyxl>=3.1.5.20260518",
 ]
 
 [tool.ruff]
@@ -36,6 +39,9 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.File", "fastapi.Form"]
 
 [tool.mypy]
 python_version = "3.12"

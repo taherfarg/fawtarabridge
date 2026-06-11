@@ -1,15 +1,35 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import ClassVar
 
 from app.core.errors import ErrorDetail
-from app.pintae.canonical import CanonicalInvoice
+from app.pintae.canonical import CanonicalInvoice, VatCategory
 
 
 @dataclass(frozen=True)
 class GeneratedXml:
     xml: bytes
     spec_version: str
+
+
+@dataclass(frozen=True)
+class CategoryTotal:
+    category: VatCategory
+    rate: Decimal
+    taxable: Decimal
+    tax: Decimal
+    exemption_reason: str | None
+
+
+@dataclass(frozen=True)
+class InvoiceTotals:
+    line_extension: Decimal
+    tax_exclusive: Decimal
+    tax_total: Decimal
+    tax_inclusive: Decimal
+    payable: Decimal
+    by_category: list[CategoryTotal]
 
 
 class InvoiceValidationError(Exception):
@@ -32,6 +52,10 @@ class InvoiceEngine(ABC):
     @abstractmethod
     def serialize(self, invoice: CanonicalInvoice) -> bytes:
         """Serialize to spec-compliant XML. Assumes :meth:`validate` returned clean."""
+
+    @abstractmethod
+    def totals(self, invoice: CanonicalInvoice) -> InvoiceTotals:
+        """Computed monetary totals under this spec version's rounding policy."""
 
     def generate(self, invoice: CanonicalInvoice) -> GeneratedXml:
         """Validate-then-serialize. The only path production code should use —

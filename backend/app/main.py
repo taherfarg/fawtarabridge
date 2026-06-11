@@ -2,7 +2,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import register_exception_handlers
-from app.api.routes import auth, health, tenants, users
+from app.api.routes import auth, contacts, health, imports, invoices, tenants, users
 from app.config import get_settings
 
 
@@ -25,6 +25,9 @@ def create_app() -> FastAPI:
     api_v1.include_router(auth.router)
     api_v1.include_router(tenants.router)
     api_v1.include_router(users.router)
+    api_v1.include_router(contacts.router)
+    api_v1.include_router(invoices.router)
+    api_v1.include_router(imports.router)
     app.include_router(api_v1)
     app.include_router(health.router)
 
