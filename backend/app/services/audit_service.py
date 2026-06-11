@@ -47,6 +47,6 @@ def list_for_entity(
             AuditEvent.entity_type == entity_type,
             AuditEvent.entity_id == entity_id,
         )
-        .order_by(AuditEvent.created_at, AuditEvent.id)
+        .order_by(AuditEvent.seq)
     )
     return list(db.scalars(stmt).all())

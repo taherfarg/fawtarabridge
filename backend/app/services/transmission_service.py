@@ -93,6 +93,22 @@ def apply_asp_status(
         transition_invoice(
             db, invoice, InvoiceStatus.ACCEPTED, actor_id=None, actor_type=actor_type
         )
+        # Same transaction as the transition: a cleared invoice is never
+        # observable without its immutable archive (FR-7.1).
+        from app.services import archive_service
+
+        archive_service.create_archive(
+            db,
+            invoice,
+            transmission,
+            ack={
+                "provider": transmission.asp_provider,
+                "message_id": transmission.asp_message_id,
+                "status": "accepted",
+                "source": actor_type,
+                "received_at": now.isoformat(),
+            },
+        )
     elif status.status == "rejected":
         transmission.status = "rejected"
         transmission.rejection_code = status.rejection_code

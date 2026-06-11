@@ -36,6 +36,11 @@ class Settings(BaseSettings):
 
     celery_eager: bool = False  # tests run tasks inline
 
+    # Penalty model (build instructions; SPEC-CHECK against Cabinet Res. 106/2025)
+    penalty_per_unsent_invoice_aed: int = 100
+    penalty_monthly_cap_aed: int = 5000
+    reporting_grace_days: int = 2
+
     cors_origins: list[str] = ["http://localhost:5173"]
 
 

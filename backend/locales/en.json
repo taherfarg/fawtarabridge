@@ -48,6 +48,16 @@
         "message": "Peppol registration is already in progress or completed"
       }
     },
+    "archive": {
+      "not_found": {
+        "message": "Archive record not found"
+      }
+    },
+    "compliance": {
+      "invalid_period": {
+        "message": "'{value}' is not a valid period — use the YYYY-MM format"
+      }
+    },
     "webhook": {
       "invalid_signature": {
         "message": "Webhook signature verification failed"

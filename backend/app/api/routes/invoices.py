@@ -203,6 +203,25 @@ def invoice_transmissions(
     return [TransmissionOut.from_model(t) for t in rows]
 
 
+@router.get("/{invoice_id}/pdf")
+def download_pdf(invoice_id: uuid.UUID, db: TenantDbDep, ctx: AuthDep) -> Response:
+    """On-the-fly PDF (FR-5.2). Non-ACCEPTED invoices are watermarked as copies;
+    the archived PDF of a cleared invoice lives under /archive."""
+    from app.services import pdf_service
+
+    invoice = _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)
+    pdf = pdf_service.render_invoice_pdf(
+        invoice_service.rehydrate(invoice),
+        status=invoice.status,
+        spec_version=invoice.spec_version,
+    )
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{invoice.invoice_number}.pdf"'},
+    )
+
+
 @router.get("/{invoice_id}/xml")
 def download_xml(invoice_id: uuid.UUID, db: TenantDbDep, ctx: AuthDep) -> Response:
     invoice = _get_or_404(InvoiceRepository(db, ctx.tenant_id), invoice_id)

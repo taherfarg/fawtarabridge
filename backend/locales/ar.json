@@ -48,6 +48,16 @@
         "message": "تسجيل بيبول قيد التنفيذ أو مكتمل بالفعل"
       }
     },
+    "archive": {
+      "not_found": {
+        "message": "سجل الأرشيف غير موجود"
+      }
+    },
+    "compliance": {
+      "invalid_period": {
+        "message": "'{value}' ليست فترة صالحة — استخدم التنسيق YYYY-MM"
+      }
+    },
     "webhook": {
       "invalid_signature": {
         "message": "فشل التحقق من توقيع الإشعار"

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, ForeignKey, Index, String, func
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Identity, Index, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -20,6 +20,9 @@ class AuditEvent(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "audit_events"
     __table_args__ = (Index("ix_audit_events_entity", "tenant_id", "entity_type", "entity_id"),)
 
+    # Monotonic insertion order: events inside one transaction share created_at
+    # (Postgres now() is transaction start), so timestamps alone can't sort them.
+    seq: Mapped[int] = mapped_column(BigInteger, Identity(always=True), unique=True)
     tenant_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("tenants.id", ondelete="CASCADE"), index=True
     )

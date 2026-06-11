@@ -300,3 +300,59 @@ SPEC-CHECK: adapt signing + payload to the contracted ASP's scheme.
     the contracted ASP/FTA code list (asp/rejections.py, asp/mock.py).
 12. Peppol participant scheme "0235:<TRN>" placeholder (asp/mock.py).
 13. Webhook signing scheme per real ASP (asp/webhook.py).
+
+---
+
+## M5 — Archive & reporting (2026-06-11)
+
+### D-040 · Archive trigger and atomicity
+An immutable `archive_records` row (exact XML bytes + rendered PDF + ASP ack
+JSON + SHA-256) is written when an invoice transitions to ACCEPTED, in the SAME
+transaction — a cleared invoice is never observable without its archive.
+Idempotent on re-delivered events (first archive wins). REJECTED invoices are
+not archived (the legal retention duty covers issued/cleared invoices; rejected
+attempts remain fully traceable via transmissions + audit).
+
+### D-041 · Archive storage: inline blobs now, WORM object storage in production
+Blobs live in Postgres for the MVP (transactional, simple, immutable via
+grants: SELECT+INSERT only, tested). Production must move them to UAE-region
+WORM object storage (NFR data residency) — the swap happens inside
+archive_service/repository without touching callers. Tenant/invoice FKs are
+RESTRICT: archives outlive casual deletions.
+
+### D-042 · Retention = issue_date + 5 years
+Per the build instruction; Feb-29 issues clamp to Feb-28. SPEC-CHECK #14: FTA
+retention may count from the end of the relevant tax period instead.
+
+### D-043 · PDF: fpdf2 + Noto fonts, bilingual, watermarked copies
+Simple A4 template (EN labels + Arabic via reshaper+bidi with vendored
+NotoSans/NotoNaskhArabic). Any PDF for a non-ACCEPTED invoice carries a visible
+"COPY — not cleared" line; the archived PDF is the authoritative one.
+`GET /invoices/{id}/pdf` renders on the fly (FR-5.2); `GET /archive/{id}/pdf`
+serves the immutable archived bytes.
+
+### D-044 · Search & export scope (FR-7.2/7.3)
+Archive search = structured filters (date range) + substring match on invoice
+number / buyer name / TRN prefix. True full-text (tsvector over line
+descriptions) is deferred until a pilot needs it. ZIP export
+(OWNER/ACCOUNTANT): per-invoice XML+PDF plus index.csv with hashes and
+retention dates — built in memory, fine for MVP volumes.
+
+### D-045 · Penalty model (FR-5.4)
+penalty = min(100 AED × unsent past-due invoices, 5,000 AED) per calendar month
+of issue_date. "Unsent" = DRAFT/VALIDATED/REJECTED/ERROR (QUEUED/SENT count as
+in-flight); "past-due" = issue_date older than the reporting grace period
+(setting, default 2 days). SPEC-CHECK #15: confirm mechanics + grace window
+against Cabinet Resolution 106 of 2025 (PRD open question 4).
+
+### D-046 · Audit ordering fix (found by a test-order flake)
+Events written in one transaction share `created_at` (Postgres now() is
+transaction start), so ordering fell back to random UUIDs. Added a monotonic
+`seq` IDENTITY column to audit_events; trails now sort deterministically.
+
+### D-047 · Demo seed
+`scripts/seed_demo.py`: demo tenant (demo@fawtarabridge.ae / Demo12345!),
+6 contacts, 30 invoices covering all seven statuses (12 archived ACCEPTED,
+4 REJECTED with two rejection codes, 3 SENT awaiting webhook, 2 QUEUED,
+2 ERROR, 2 VALIDATED, 5 DRAFT incl. 2 fixable-invalid). Idempotent, works
+without a running worker, kept green by a test.
