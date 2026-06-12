@@ -21,6 +21,11 @@ celery_app.conf.update(
     task_acks_late=True,  # at-least-once: a crashed worker re-delivers (idempotent tasks)
     task_always_eager=settings.celery_eager,
     task_eager_propagates=settings.celery_eager,
+    beat_schedule={
+        # FR-6.1 weekly digest (interval-based; switch to crontab once the
+        # preferred local send time is decided with the pilot customers)
+        "weekly-digest": {"task": "app.weekly_digest", "schedule": 7 * 24 * 3600.0},
+    },
 )
 
 

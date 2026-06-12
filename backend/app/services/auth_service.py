@@ -91,6 +91,7 @@ def signup(
     try:
         # Staged flushes: without relationship() mappings SQLAlchemy does not order
         # inserts across these tables, and the membership FK needs both parents.
+        tenant.trial_ends_at = datetime.now(UTC).date() + timedelta(days=14)  # FR-8.1
         db.add_all([user, tenant])
         db.flush()
         db.add(TenantMembership(tenant_id=tenant_id, user_id=user_id, role=Role.OWNER))

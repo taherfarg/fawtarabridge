@@ -65,6 +65,15 @@ def queue_transmission(
     db.add(transmission)
     db.flush()
 
+    # Metering (FR-8.2): first send of an invoice counts, resends are free.
+    # Never blocks — billing problems must not stop compliance transmissions.
+    from app.billing.service import record_transmission_usage
+    from app.models import Tenant
+
+    tenant = db.get(Tenant, invoice.tenant_id)
+    if tenant is not None:
+        record_transmission_usage(db, tenant, first_send=ordinal == 1)
+
     transition_invoice(
         db,
         invoice,
@@ -121,6 +130,18 @@ def apply_asp_status(
             actor_id=None,
             actor_type=actor_type,
             extra={"rejection_code": status.rejection_code or ""},
+        )
+        # FR-6.1: rejection alerts to owners (cannot be disabled — FR-6.3).
+        from app.notifications.service import notify_owners
+
+        notify_owners(
+            db,
+            invoice.tenant_id,
+            template="invoice_rejected",
+            params={
+                "number": invoice.invoice_number,
+                "code": status.rejection_code or "?",
+            },
         )
     else:  # "error"
         transmission.status = "failed"

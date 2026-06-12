@@ -395,3 +395,47 @@ job. Heavier component/E2E testing deferred to the pilot-hardening phase; the
 full API behavior remains covered by the 245 backend tests. Live smoke verified:
 vite dev server → /api proxy → backend returns the bilingual envelope end-to-end
 (also caught a stale Docker api image that needed rebuilding for the M2–M5 deps).
+
+---
+
+## M7 — Billing & notification stubs (2026-06-12)
+
+### D-053 · Plan catalog & metering unit
+Plans per FR-8.1 (Starter 149/100, Growth 349/500, Accountant 999). The
+Accountant plan's invoice quota (2000) is our own working assumption — PRD
+prices it by client companies; finalize with real pricing. Metering counts one
+unit per invoice's FIRST transmission in the month; resends/fix-and-resend are
+free (billing a customer for fixing a rejection would be hostile). 14-day trial
+date set at signup (`tenants.trial_ends_at`); enforcement is deliberately absent
+until Stripe is real.
+
+### D-054 · Never-block guarantee implemented twice
+(1) Overage beyond the quota only increments `overage_count` (AED 1/invoice,
+FR-8.2) — no code path can refuse a transmission for billing reasons; (2) the
+whole metering call is wrapped so even an unexpected metering bug logs and lets
+the send proceed. The 80% warning fires exactly once per month (flag on the
+usage row) and notifies owners via both channels.
+
+### D-055 · Cross-tenant background jobs
+The weekly digest must iterate tenants, which RLS (correctly) forbids. Added
+`app_all_tenant_ids()` — a SECURITY DEFINER function exposing ONLY active tenant
+ids, no row data; the digest then opens a normal `tenant_session` per tenant so
+every read stays under RLS. This is the single sanctioned cross-tenant
+primitive; anything needing more goes through the future admin console design.
+
+### D-056 · Notification architecture
+`NotificationChannel` protocol with console WhatsApp + email stubs; every send
+is recorded in the RLS-protected `notifications` table (INSERT-only grants), so
+tests/UI/admin can observe outbound traffic. Bodies are bilingual (Arabic first,
+English second) rendered from the locale catalogs. Wired per instructions:
+rejection events (owners, not disableable — FR-6.3), 80% usage warning, weekly
+digest (Celery beat, interval-based until pilots pick a send time). Real
+WhatsApp BSP/SMTP swap in behind the protocol; per-user preferences arrive with
+the real channels.
+
+### D-057 · Stripe stub boundary
+`PaymentProvider` protocol (`start_subscription`, `report_overage`) with a
+console implementation; plan changes audit who/when/before/after. Nothing
+outside `app/billing/stripe_stub.py` may reference Stripe concepts — the real
+integration replaces one module. Self-dogfooding our own e-invoices (FR-8.3)
+lands together with real Stripe.

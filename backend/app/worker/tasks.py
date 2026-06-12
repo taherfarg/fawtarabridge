@@ -2,7 +2,7 @@
 
 import uuid
 
-from app.db.session import tenant_session
+from app.db.session import get_sessionmaker, tenant_session
 from app.models import Tenant
 from app.services import audit_service
 from app.services.transmission_service import backoff_seconds, execute_transmission
@@ -17,6 +17,51 @@ def transmit_invoice(self, transmission_id: str, tenant_id: str) -> str:  # type
         # itself once attempt_count reaches the configured maximum.
         raise self.retry(countdown=backoff_seconds(attempt), max_retries=10)
     return outcome
+
+
+@celery_app.task(name="app.weekly_digest")
+def weekly_digest() -> int:
+    """FR-6.1 weekly digest: per-tenant 7-day status counts + penalty risk to the
+    owners. Tenants are enumerated via the SECURITY DEFINER id-only function;
+    all data access then runs under normal per-tenant RLS."""
+    from datetime import date, timedelta
+
+    from sqlalchemy import func as sa_func
+    from sqlalchemy import select, text
+
+    from app.models import Invoice
+    from app.notifications.service import notify_owners
+    from app.services.compliance_service import monthly_summary
+
+    engine_session = get_sessionmaker()()
+    try:
+        tenant_ids = [row[0] for row in engine_session.execute(text("SELECT app_all_tenant_ids()"))]
+    finally:
+        engine_session.close()
+
+    notified = 0
+    week_ago = date.today() - timedelta(days=7)
+    for tenant_id in tenant_ids:
+        with tenant_session(tenant_id) as db:
+            rows = db.execute(
+                select(Invoice.status, sa_func.count())
+                .where(Invoice.tenant_id == tenant_id, Invoice.issue_date >= week_ago)
+                .group_by(Invoice.status)
+            ).all()
+            counts = {status: count for status, count in rows}
+            summary = monthly_summary(db, tenant_id, None)
+            notified += notify_owners(
+                db,
+                tenant_id,
+                template="weekly_digest",
+                params={
+                    "accepted": counts.get("ACCEPTED", 0),
+                    "rejected": counts.get("REJECTED", 0),
+                    "drafts": counts.get("DRAFT", 0),
+                    "penalty": summary["penalty_risk_aed"],
+                },
+            )
+    return notified
 
 
 @celery_app.task(name="app.register_participant")

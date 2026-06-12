@@ -1,5 +1,6 @@
 from app.models.archive import ArchiveRecord
 from app.models.audit import AuditEvent
+from app.models.billing import NotificationRecord, UsageRecord
 from app.models.contact import Contact
 from app.models.enums import RevenueBand, Role
 from app.models.invoice import ImportMappingTemplate, Invoice
@@ -13,6 +14,7 @@ __all__ = [
     "Contact",
     "ImportMappingTemplate",
     "Invoice",
+    "NotificationRecord",
     "OtpCode",
     "RefreshToken",
     "RevenueBand",
@@ -20,5 +22,6 @@ __all__ = [
     "Tenant",
     "TenantMembership",
     "Transmission",
+    "UsageRecord",
     "User",
 ]

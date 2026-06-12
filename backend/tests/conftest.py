@@ -48,8 +48,9 @@ from app.services.otp import get_otp_provider  # noqa: E402
 SessionFactory = Callable[[], Session]
 
 ALL_TABLES = (
-    "archive_records, audit_events, transmissions, import_mapping_templates, invoices, "
-    "contacts, otp_codes, refresh_tokens, tenant_memberships, tenants, users"
+    "notifications, usage_records, archive_records, audit_events, transmissions, "
+    "import_mapping_templates, invoices, contacts, otp_codes, refresh_tokens, "
+    "tenant_memberships, tenants, users"
 )
 
 

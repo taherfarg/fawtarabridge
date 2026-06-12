@@ -309,6 +309,11 @@
       }
     }
   },
+  "notifications": {
+    "invoice_rejected": "Invoice {number} was rejected by the e-invoicing system (code {code}). Open FawtaraBridge to fix and resend it.",
+    "usage_80": "Heads up: you have used {used} of {included} invoices included in your {plan} plan this month. Transmissions will never be blocked; extra invoices are billed at AED 1 each.",
+    "weekly_digest": "Your week at a glance: {accepted} accepted, {rejected} rejected, {drafts} drafts pending. Current penalty risk: AED {penalty}."
+  },
   "roles": {
     "owner": "Owner",
     "accountant": "Accountant",

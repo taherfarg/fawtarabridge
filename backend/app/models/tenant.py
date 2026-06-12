@@ -1,4 +1,6 @@
-from sqlalchemy import Enum, String
+from datetime import date
+
+from sqlalchemy import Date, Enum, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -29,3 +31,5 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     asp_onboarding_status: Mapped[str] = mapped_column(
         String(20), default="not_started"
     )  # not_started | pending | registered | failed
+    plan: Mapped[str] = mapped_column(String(20), default="starter")
+    trial_ends_at: Mapped[date | None] = mapped_column(Date)

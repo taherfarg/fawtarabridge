@@ -72,9 +72,7 @@ def upgrade() -> None:
     )
 
     # Deterministic audit ordering: same-transaction events share created_at.
-    op.execute(
-        "ALTER TABLE audit_events ADD COLUMN seq BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE"
-    )
+    op.execute("ALTER TABLE audit_events ADD COLUMN seq BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE")
 
     op.execute("GRANT SELECT, INSERT ON archive_records TO fawtara_app")
     op.execute("ALTER TABLE archive_records ENABLE ROW LEVEL SECURITY")
