@@ -115,6 +115,7 @@
     "vatZ": "Zero-rated 0%",
     "vatE": "Exempt",
     "vatAE": "Reverse charge",
+    "vatO": "Out of scope",
     "exemptionReason": "Exemption reason",
     "save": "Save invoice",
     "saved": "Invoice saved",

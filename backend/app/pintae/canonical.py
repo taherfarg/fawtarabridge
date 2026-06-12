@@ -20,16 +20,17 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class VatCategory(enum.StrEnum):
-    """UAE VAT treatment per line, using UNCL5305-style codes as in Peppol PINT.
+    """UAE VAT treatment per line (UNCL5305 subset).
 
-    # SPEC-CHECK: PINT-AE may define additional categories (e.g. 'O' out of scope,
-    # margin schemes). v1 supports the four required by the MVP instructions.
+    Verified against PINT AE Billing v1.0.3 (docs.peppol.eu/poac/ae): the AE
+    specialization allows exactly S / Z / E / AE / O.
     """
 
     STANDARD = "S"  # 5%
     ZERO_RATED = "Z"  # 0%
     EXEMPT = "E"  # 0%, exemption reason required
     REVERSE_CHARGE = "AE"  # 0%, buyer accounts for VAT
+    OUT_OF_SCOPE = "O"  # 0%, not subject to VAT; reason required
 
 
 class Address(BaseModel):

@@ -145,6 +145,8 @@ def test_rule_vat_rate_must_match_category() -> None:
         (VatCategory.EXEMPT, "0", True),
         (VatCategory.REVERSE_CHARGE, "0", True),
         (VatCategory.REVERSE_CHARGE, "5", False),
+        (VatCategory.OUT_OF_SCOPE, "0", True),
+        (VatCategory.OUT_OF_SCOPE, "5", False),
     ]
     for category, rate, ok in cases:
         invoice = make_invoice(
@@ -155,7 +157,7 @@ def test_rule_vat_rate_must_match_category() -> None:
 
 
 def test_rule_exemption_reason_required_for_e_and_ae() -> None:
-    for category in (VatCategory.EXEMPT, VatCategory.REVERSE_CHARGE):
+    for category in (VatCategory.EXEMPT, VatCategory.REVERSE_CHARGE, VatCategory.OUT_OF_SCOPE):
         invoice = make_invoice(lines=[make_line(vat_category=category, vat_rate="0")])
         assert codes(rules.rule_exemption_reasons(invoice)) == [
             "invoice.line.exemption_reason_missing"

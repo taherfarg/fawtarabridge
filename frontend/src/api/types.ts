@@ -64,7 +64,7 @@ export interface InvoiceLine {
   unit_code?: string;
   unit_price: string;
   discount_amount?: string;
-  vat_category: "S" | "Z" | "E" | "AE";
+  vat_category: "S" | "Z" | "E" | "AE" | "O";
   vat_rate: string;
   exemption_reason?: string | null;
 }

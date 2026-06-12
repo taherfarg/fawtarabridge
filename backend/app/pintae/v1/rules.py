@@ -174,8 +174,13 @@ def rule_vat_rates(inv: CanonicalInvoice) -> list[ErrorDetail]:
 
 def rule_exemption_reasons(inv: CanonicalInvoice) -> list[ErrorDetail]:
     errors: list[ErrorDetail] = []
+    reason_categories = (
+        VatCategory.EXEMPT,
+        VatCategory.REVERSE_CHARGE,
+        VatCategory.OUT_OF_SCOPE,
+    )
     for i, line in enumerate(inv.lines):
-        needs_reason = line.vat_category in (VatCategory.EXEMPT, VatCategory.REVERSE_CHARGE)
+        needs_reason = line.vat_category in reason_categories
         if needs_reason and not line.exemption_reason:
             errors.append(
                 _err(

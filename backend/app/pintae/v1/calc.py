@@ -17,12 +17,13 @@ from app.pintae.canonical import CanonicalInvoice, InvoiceLine, VatCategory
 
 TWO_PLACES = Decimal("0.01")
 
-# v1 fixed rates per category. # SPEC-CHECK: 5% UAE standard rate as of 2026.
+# Fixed rates per category — 5% standard confirmed by PINT AE Billing v1.0.3.
 CATEGORY_RATES: dict[VatCategory, Decimal] = {
     VatCategory.STANDARD: Decimal("5"),
     VatCategory.ZERO_RATED: Decimal("0"),
     VatCategory.EXEMPT: Decimal("0"),
     VatCategory.REVERSE_CHARGE: Decimal("0"),
+    VatCategory.OUT_OF_SCOPE: Decimal("0"),
 }
 
 

@@ -439,3 +439,38 @@ console implementation; plan changes audit who/when/before/after. Nothing
 outside `app/billing/stripe_stub.py` may reference Stripe concepts — the real
 integration replaces one module. Self-dogfooding our own e-invoices (FR-8.3)
 lands together with real Stripe.
+
+---
+
+## SPEC-CHECK verification round 1 (2026-06-12)
+
+Verified against the published **PINT AE Billing v1.0.3**
+(https://docs.peppol.eu/poac/ae/v1.0.3/pint-ae/). Register status:
+
+| # | Item | Status |
+|---|---|---|
+| 1 | CustomizationID `urn:peppol:pint:billing-1@ae-1` / ProfileID `urn:peppol:bis:billing` | ✅ CONFIRMED verbatim |
+| 2 | Rounding HALF_UP to 2 decimals | ◐ spec mandates max 2 decimals on totals; HALF_UP mode still to confirm with MoF sample files |
+| 3 | Per-category VAT computation | ◐ consistent with the PINT/EN 16931 model; lock with official samples |
+| 4 | Category set + 5% standard rate | ✅ rate confirmed; set is S/Z/E/AE/**O** — **'O' (out of scope) added to the engine, rules, importer and UI in this round** |
+| 5 | Buyer TRN mandatory (B2B) | ✅ confirmed for VAT-registered buyers; B2C relaxation later if needed |
+| 6 | UAE Peppol scheme ID | ✅ CONFIRMED: 0235 = UAE TIN/TRN for both parties |
+| 7 | Bilingual party name / description carriage | ⏳ open — not covered by the BIS page; check official samples |
+| 8 | Percent short form | ⏳ open — golden-file question for the official samples |
+| 9 | Unit-price extra precision | ◐ EN 16931 carry-over, not contradicted |
+| 10 | Spec version label | ✅ official line is PINT AE 1.0.x (current 1.0.3); internal `pint-ae-1.0` maps to it — record per-transmission as today |
+| 11 | ASP rejection-code list | ⏳ needs the contracted ASP's sandbox docs |
+| 12 | Peppol participant scheme in mock | ✅ same as #6 — placeholder was correct |
+| 13 | Webhook signing scheme | ⏳ needs the contracted ASP |
+| 14 | Retention from issue date vs tax period | ⏳ FTA matter, not in PINT |
+| 15 | Penalty mechanics (Cabinet Res. 106/2025) | ⏳ legal text required |
+
+Also learned: allowed type codes include 380/389/480 + credit notes 381/261
+(our 380-only restriction stays a deliberate MVP scope limit, D-020), and AED is
+mandated as the *tax currency* even for foreign-currency invoices — our AED-only
+v1 satisfies this trivially; foreign-currency support must add TaxCurrencyCode.
+
+### D-058 · 'O' (out of scope) category added after verification
+Same handling as E/AE: rate 0, reason text required, flows through engine,
+import VAT mapping and the invoice form. No golden fixture uses it yet — one
+should be added together with the official MoF sample files.

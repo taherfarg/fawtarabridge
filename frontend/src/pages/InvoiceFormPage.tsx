@@ -13,7 +13,7 @@ import type {
 } from "../api/types";
 import { ErrorList, errorsOf, money } from "../components/ui";
 
-const VAT_RATES: Record<string, string> = { S: "5", Z: "0", E: "0", AE: "0" };
+const VAT_RATES: Record<string, string> = { S: "5", Z: "0", E: "0", AE: "0", O: "0" };
 
 function emptyLine(): InvoiceLine {
   return { description: "", quantity: "1", unit_price: "0", discount_amount: "0", vat_category: "S", vat_rate: "5" };
@@ -225,6 +225,7 @@ export default function InvoiceFormPage() {
                 <option value="Z">{t("form.vatZ")}</option>
                 <option value="E">{t("form.vatE")}</option>
                 <option value="AE">{t("form.vatAE")}</option>
+                <option value="O">{t("form.vatO")}</option>
               </select>
             </div>
             <div>
@@ -237,7 +238,7 @@ export default function InvoiceFormPage() {
                 ✕
               </button>
             </div>
-            {(line.vat_category === "E" || line.vat_category === "AE") && (
+            {(line.vat_category === "E" || line.vat_category === "AE" || line.vat_category === "O") && (
               <div className="md:col-span-12">
                 <label className="label">{t("form.exemptionReason")}</label>
                 <input
