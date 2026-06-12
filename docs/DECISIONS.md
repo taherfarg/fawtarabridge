@@ -356,3 +356,42 @@ transaction start), so ordering fell back to random UUIDs. Added a monotonic
 4 REJECTED with two rejection codes, 3 SENT awaiting webhook, 2 QUEUED,
 2 ERROR, 2 VALIDATED, 5 DRAFT incl. 2 fixable-invalid). Idempotent, works
 without a running worker, kept green by a test.
+
+---
+
+## M6 — Frontend (2026-06-12)
+
+### D-048 · Frontend stack & structure
+React 18 + Vite 6 + TypeScript (strict) + TailwindCSS v4 (CSS-first config) +
+TanStack Query + react-router. No form library — controlled components keep the
+dependency surface small. Auth tokens in localStorage with transparent refresh
+(retry-once on 401) in a single fetch wrapper; ApiError carries the bilingual
+error envelope. Vite proxies /api to the backend (compose overrides the target).
+
+### D-049 · Arabic-first RTL
+Arabic is the default language; `document.dir` flips with the language
+(react-i18next). Backend errors arrive pre-localized (message_ar/message_en) and
+are rendered per active language — the frontend never translates error codes.
+Latin-content fields (emails, TRNs, dates, amounts) are pinned `dir="ltr"`
+inside the RTL layout.
+
+### D-050 · Dashboard semantics
+Compliance health = ACCEPTED / (ACCEPTED+REJECTED+ERROR) — transparent, no
+magic scoring; shown as "—" before anything was submitted. Deadline banner keys
+on revenue_band (gte_50m → Jan 2027, else July 2027). Onboarding checklist
+(FR-1.5) computed live from API state: profile, phone verified, Peppol
+registered, first contact/invoice/acceptance.
+
+### D-051 · Import wizard column mapping
+For CSV files the wizard reads the header row client-side and offers dropdowns;
+for .xlsx the column names are typed manually (client-side xlsx parsing not
+worth a dependency in MVP) — or a saved template skips the step entirely.
+Mapping correctness is still enforced server-side either way.
+
+### D-052 · M6 testing scope
+Frontend gate = strict tsc + production build + vitest smoke tests (i18n/RTL
+switching, bilingual error rendering, status badges) in CI alongside the backend
+job. Heavier component/E2E testing deferred to the pilot-hardening phase; the
+full API behavior remains covered by the 245 backend tests. Live smoke verified:
+vite dev server → /api proxy → backend returns the bilingual envelope end-to-end
+(also caught a stale Docker api image that needed rebuilding for the M2–M5 deps).
