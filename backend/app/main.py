@@ -20,6 +20,9 @@ from app.config import get_settings
 
 
 def create_app() -> FastAPI:
+    from app.core.logging_setup import setup_logging
+
+    setup_logging()
     settings = get_settings()
     if settings.env == "prod":
         problems = settings.validate_production_secrets()

@@ -1,0 +1,74 @@
+# Staging/production profile. ALL secrets come from the environment (.env.prod) —
+# the app refuses to boot on dev defaults (D-059). Host must be UAE-region (NFR).
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fawtara
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env.prod}
+      POSTGRES_DB: fawtara
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fawtara -d fawtara"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4"
+    environment:
+      FAWTARA_ENV: prod
+      FAWTARA_DATABASE_URL: ${FAWTARA_DATABASE_URL:?}
+      FAWTARA_ADMIN_DATABASE_URL: ${FAWTARA_ADMIN_DATABASE_URL:?}
+      FAWTARA_REDIS_URL: redis://redis:6379/0
+      FAWTARA_JWT_SECRET: ${FAWTARA_JWT_SECRET:?}
+      FAWTARA_ASP_WEBHOOK_SECRET: ${FAWTARA_ASP_WEBHOOK_SECRET:?}
+      FAWTARA_SENTRY_DSN: ${FAWTARA_SENTRY_DSN:-}
+      FAWTARA_CORS_ORIGINS: '["${PUBLIC_ORIGIN:?}"]'
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  worker:
+    build: ./backend
+    command: celery -A app.worker.celery_app worker --beat --loglevel=info
+    environment:
+      FAWTARA_ENV: prod
+      FAWTARA_DATABASE_URL: ${FAWTARA_DATABASE_URL:?}
+      FAWTARA_ADMIN_DATABASE_URL: ${FAWTARA_ADMIN_DATABASE_URL:?}
+      FAWTARA_REDIS_URL: redis://redis:6379/0
+      FAWTARA_JWT_SECRET: ${FAWTARA_JWT_SECRET:?}
+      FAWTARA_ASP_WEBHOOK_SECRET: ${FAWTARA_ASP_WEBHOOK_SECRET:?}
+      FAWTARA_SENTRY_DSN: ${FAWTARA_SENTRY_DSN:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  dbdata:

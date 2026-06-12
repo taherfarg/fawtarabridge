@@ -43,6 +43,8 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:5173"]
 
+    sentry_dsn: str | None = None
+
     # Auth brute-force protection (NFR): fixed window per client IP via Redis.
     auth_rate_limit_enabled: bool = True
     auth_rate_limit_per_minute: int = 10
