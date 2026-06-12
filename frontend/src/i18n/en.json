@@ -70,6 +70,8 @@
     "to": "To",
     "empty": "No invoices yet. Create one or import a file.",
     "duplicateFlag": "Possible duplicate",
+    "selected": "{{count}} selected",
+    "bulkDone": "Done: {{ok}} succeeded, {{failed}} failed",
     "validate": "Validate",
     "send": "Send to FTA",
     "resend": "Resend",

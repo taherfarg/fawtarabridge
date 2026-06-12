@@ -474,3 +474,24 @@ v1 satisfies this trivially; foreign-currency support must add TaxCurrencyCode.
 Same handling as E/AE: rate 0, reason text required, flows through engine,
 import VAT mapping and the invoice form. No golden fixture uses it yet — one
 should be added together with the official MoF sample files.
+
+---
+
+## M8 - Pilot hardening (2026-06-12)
+
+### D-059 - Production boot guard
+create_app() raises at startup when FAWTARA_ENV=prod and any secret still has a
+dev default (JWT, webhook, app DB-role password). A staging/prod deployment can
+never silently run on known credentials.
+
+### D-060 - Auth rate limiting: fixed window, fail-open
+Redis INCR per (IP, route, minute), default 10/min on all /auth endpoints,
+bilingual 429. Fail-open by design: if Redis is down, login availability beats
+throttling. Disabled in the test env except the dedicated test.
+
+### D-061 - M8 scope shipped
+Member role-change/removal with last-owner protection; /health/ready DB probe;
+structured JSON logging + optional Sentry (no PII, PDPL); docker-compose.prod.yml
+(env-required secrets, uvicorn x4, celery worker+beat, nginx frontend with /api
+proxy); encrypted daily backup script; bulk validate/send endpoint + list UI
+(SAVEPOINT per invoice, per-item bilingual results).

@@ -13,6 +13,9 @@ from app.repositories.contacts import ContactRepository
 from app.repositories.invoices import InvoiceRepository
 from app.repositories.transmissions import TransmissionRepository
 from app.schemas.invoice import (
+    BulkActionIn,
+    BulkItemResult,
+    BulkOut,
     InvoiceCreateIn,
     InvoiceCreateOut,
     InvoiceDetailOut,
@@ -67,6 +70,43 @@ def create_invoice(payload: InvoiceCreateIn, db: TenantDbDep, ctx: WriteCtx) -> 
     return InvoiceCreateOut(
         invoice=InvoiceOut.model_validate(invoice), errors=errors, warnings=warnings
     )
+
+
+@router.post("/bulk", response_model=BulkOut)
+def bulk_action(payload: BulkActionIn, db: TenantDbDep, ctx: WriteCtx) -> BulkOut:
+    """Bulk validate/send (FR-5.2). SAVEPOINT per invoice: one failure never
+    poisons the batch; every failure carries its bilingual error report."""
+    from app.pintae import InvoiceValidationError
+
+    repo = InvoiceRepository(db, ctx.tenant_id)
+    results: list[BulkItemResult] = []
+    to_dispatch: list[uuid.UUID] = []
+    for invoice_id in payload.ids:
+        try:
+            with db.begin_nested():
+                invoice = _get_or_404(repo, invoice_id)
+                if payload.action == "validate":
+                    errors = invoice_service.validate_invoice(db, invoice, actor_id=ctx.user_id)
+                    results.append(
+                        BulkItemResult(
+                            id=invoice_id, ok=not errors, status=invoice.status, errors=errors
+                        )
+                    )
+                else:
+                    transmission = transmission_service.queue_transmission(
+                        db, invoice, actor_id=ctx.user_id
+                    )
+                    to_dispatch.append(transmission.id)
+                    results.append(BulkItemResult(id=invoice_id, ok=True, status=invoice.status))
+        except AppError as exc:
+            results.append(BulkItemResult(id=invoice_id, ok=False, errors=[exc.detail()]))
+        except InvoiceValidationError as exc:
+            results.append(BulkItemResult(id=invoice_id, ok=False, errors=exc.errors))
+    db.commit()  # workers must see the queued rows (eager tests run inline below)
+    for transmission_id in to_dispatch:
+        transmit_invoice.delay(str(transmission_id), str(ctx.tenant_id))
+    succeeded = sum(1 for r in results if r.ok)
+    return BulkOut(results=results, succeeded=succeeded, failed=len(results) - succeeded)
 
 
 @router.get("", response_model=InvoiceListOut)

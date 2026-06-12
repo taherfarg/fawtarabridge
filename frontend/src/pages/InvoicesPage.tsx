@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
@@ -29,6 +30,28 @@ export default function InvoicesPage() {
     queryKey: ["invoices", query.toString()],
     queryFn: () => api.get<Paged<InvoiceOut>>(`/invoices?${query}`),
   });
+  const queryClient = useQueryClient();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkResult, setBulkResult] = useState<string | null>(null);
+
+  function toggle(id: string) {
+    setSelected((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function runBulk(action: "validate" | "send") {
+    const result = await api.post<{ succeeded: number; failed: number }>("/invoices/bulk", {
+      action,
+      ids: [...selected],
+    });
+    setBulkResult(t("invoices.bulkDone", { ok: result.succeeded, failed: result.failed }));
+    setSelected(new Set());
+    void queryClient.invalidateQueries({ queryKey: ["invoices"] });
+  }
 
   function setFilter(key: string, value: string) {
     setParams((prev) => {
@@ -88,9 +111,26 @@ export default function InvoicesPage() {
         <div className="card text-center text-slate-500 text-sm">{t("invoices.empty")}</div>
       ) : (
         <div className="card overflow-x-auto p-0">
+          {(selected.size > 0 || bulkResult) && (
+            <div className="flex items-center gap-3 px-3 py-2 border-b border-slate-200 bg-slate-50 text-sm">
+              {selected.size > 0 && (
+                <>
+                  <span>{t("invoices.selected", { count: selected.size })}</span>
+                  <button className="btn-secondary" onClick={() => void runBulk("validate")}>
+                    {t("invoices.validate")}
+                  </button>
+                  <button className="btn-primary" onClick={() => void runBulk("send")}>
+                    {t("invoices.send")}
+                  </button>
+                </>
+              )}
+              {bulkResult && <span className="text-emerald-700">{bulkResult}</span>}
+            </div>
+          )}
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-200 text-start text-xs uppercase text-slate-500">
+                <th className="table-cell w-8" />
                 <th className="table-cell text-start">{t("invoices.number")}</th>
                 <th className="table-cell text-start">{t("invoices.issueDate")}</th>
                 <th className="table-cell text-start">{t("invoices.buyer")}</th>
@@ -101,6 +141,13 @@ export default function InvoicesPage() {
             <tbody>
               {invoices.data?.items.map((invoice) => (
                 <tr key={invoice.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="table-cell">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(invoice.id)}
+                      onChange={() => toggle(invoice.id)}
+                    />
+                  </td>
                   <td className="table-cell">
                     <Link to={`/invoices/${invoice.id}`} className="font-semibold text-emerald-800 hover:underline">
                       {invoice.invoice_number}

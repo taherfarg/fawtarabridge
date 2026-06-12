@@ -1,6 +1,7 @@
 import uuid
 from datetime import date
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -90,6 +91,24 @@ class InvoiceListOut(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+class BulkActionIn(BaseModel):
+    action: Literal["validate", "send"]
+    ids: list[uuid.UUID] = Field(min_length=1, max_length=100)
+
+
+class BulkItemResult(BaseModel):
+    id: uuid.UUID
+    ok: bool
+    status: str | None = None
+    errors: list[ErrorDetail] = Field(default_factory=list)
+
+
+class BulkOut(BaseModel):
+    results: list[BulkItemResult]
+    succeeded: int
+    failed: int
 
 
 class ValidationReportOut(BaseModel):
