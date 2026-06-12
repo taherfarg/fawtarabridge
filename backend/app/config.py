@@ -43,6 +43,21 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:5173"]
 
+    # Auth brute-force protection (NFR): fixed window per client IP via Redis.
+    auth_rate_limit_enabled: bool = True
+    auth_rate_limit_per_minute: int = 10
+
+    def validate_production_secrets(self) -> list[str]:
+        """Names of secrets still on dev defaults — startup refuses in prod."""
+        problems = []
+        if "change-me" in self.jwt_secret:
+            problems.append("FAWTARA_JWT_SECRET")
+        if "change-me" in self.asp_webhook_secret:
+            problems.append("FAWTARA_ASP_WEBHOOK_SECRET")
+        if "fawtara_app:fawtara_app" in self.database_url:
+            problems.append("FAWTARA_DATABASE_URL (default app-role password)")
+        return problems
+
 
 @lru_cache
 def get_settings() -> Settings:

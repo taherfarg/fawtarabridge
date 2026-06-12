@@ -34,3 +34,7 @@ class MemberCreateIn(BaseModel):
 class MemberOut(BaseModel):
     user: UserOut
     role: Role
+
+
+class MemberRoleIn(BaseModel):
+    role: Role

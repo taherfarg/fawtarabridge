@@ -21,6 +21,10 @@ from app.config import get_settings
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    if settings.env == "prod":
+        problems = settings.validate_production_secrets()
+        if problems:  # fail fast: never boot production on dev secrets (D-059)
+            raise RuntimeError(f"dev-default secrets in production: {', '.join(problems)}")
     app = FastAPI(
         title="FawtaraBridge API",
         version="0.1.0",

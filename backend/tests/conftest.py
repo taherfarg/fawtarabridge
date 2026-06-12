@@ -29,6 +29,7 @@ APP_TEST_URL = f"postgresql+psycopg://fawtara_app:fawtara_app@{DB_HOST}:{DB_PORT
 os.environ["FAWTARA_DATABASE_URL"] = APP_TEST_URL
 os.environ["FAWTARA_ADMIN_DATABASE_URL"] = ADMIN_TEST_URL
 os.environ["FAWTARA_CELERY_EAGER"] = "true"  # tasks run inline in tests
+os.environ["FAWTARA_AUTH_RATE_LIMIT_ENABLED"] = "false"  # dedicated test re-enables
 
 import uuid  # noqa: E402
 from collections.abc import Callable  # noqa: E402

@@ -31,6 +31,9 @@
       "not_member": {
         "message": "You are not a member of this company"
       },
+      "rate_limited": {
+        "message": "Too many attempts — please wait a minute and try again"
+      },
       "user_inactive": {
         "message": "This account is deactivated",
         "suggestion": "Contact support"
@@ -99,6 +102,13 @@
     "member": {
       "already_exists": {
         "message": "This user is already a member of the company"
+      },
+      "not_found": {
+        "message": "Member not found"
+      },
+      "last_owner": {
+        "message": "The company must keep at least one owner",
+        "suggestion": "Make someone else an owner first"
       }
     },
     "contact": {

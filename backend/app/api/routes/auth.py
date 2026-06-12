@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.api.deps import AuthDep, DbDep, TenantDbDep
+from app.core.rate_limit import enforce_auth_rate_limit
 from app.schemas.auth import (
     LoginIn,
     LoginOut,
@@ -19,7 +20,7 @@ from app.schemas.user import UserOut
 from app.services import auth_service
 from app.services.otp import OTPProvider, get_otp_provider
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"], dependencies=[Depends(enforce_auth_rate_limit)])
 
 OtpProviderDep = Annotated[OTPProvider, Depends(get_otp_provider)]
 
